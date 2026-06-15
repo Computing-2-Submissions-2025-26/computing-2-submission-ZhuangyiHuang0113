@@ -1,16 +1,17 @@
 {
-  "name": "computing-2-submission",
-  "type": "module",
+  "name": "inca-treasure-computing-2",
   "version": "1.0.0",
-  "description": "",
-  "main": "web-app/Module.js",
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "ramda": "^0.32.0"
+  "type": "module",
+  "description": "A turn-based board game web application for Computing 2.",
+  "main": "web-app/IncaTreasure.js",
+  "scripts": {
+    "test": "mocha",
+    "docs": "jsdoc -c jsdoc.json",
+    "lint": "node --check web-app/IncaTreasure.js && node --check web-app/main.js && node --check web-app/tests/IncaTreasure.test.js"
   },
   "devDependencies": {
     "docdash": "^2.0.2",
+    "jsdoc": "^4.0.4",
     "mocha": "^11.7.5"
   }
 }

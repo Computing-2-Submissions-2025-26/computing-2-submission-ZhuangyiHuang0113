@@ -1,9 +1,180 @@
-<!-- In HTML Comments are written like this -->
-<!-- They can all be removed for your apps -->
-<!doctype html> <!-- This first line tells browsers to expect modern standard html 5 -->
-<html lang="en-gb"> <!-- This is indicates the page is written in British English, useful for accessibility -->
-<meta charset="utf-8"> <!-- This indicates how the file is encoded. utf-8 is standard -->
-<title>Your Web-app Title</title> <!-- All pages need a title, this will be displayed in the browser's title bar -->
-<link rel="stylesheet" href="default.css"> <!-- Import style sheet – default.css -->
-<link rel="icon" href="./assets/favicon.png"> <!-- Import 'Favorites Icon' – favicon.png -->
-<script type="module" src="main.js"></script> <!-- Load the main script. Must be type="module". Have only one of these -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inca Treasure</title>
+  <link rel="stylesheet" href="default.css">
+</head>
+<body>
+  <main id="app">
+    <section id="menu-screen" class="screen active">
+      <div class="stone-scene">
+        <div class="mountains"></div>
+        <div class="ruins"></div>
+        <div class="menu-card panel">
+          <div class="pattern-bar"></div>
+          <h1>MAIN MENU</h1>
+          <button id="solo-button" class="menu-button">
+            <span>PLAY WITH BOTS</span>
+            <small>YOU + 3 EXPLORER BOTS</small>
+          </button>
+          <button id="room-button" class="menu-button">LOCAL MULTIPLAYER</button>
+          <button id="rules-button" class="menu-button">HOW TO PLAY</button>
+          <div class="menu-footer">
+            <button id="sound-button" class="icon-button" aria-label="Toggle sound">ON</button>
+            <button id="fullscreen-button" class="icon-button" aria-label="Fullscreen">FS</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="room-screen" class="screen">
+      <div class="stone-scene">
+        <div class="room-card panel">
+          <button class="back-button" data-back="menu-screen">&larr; BACK</button>
+          <div class="pattern-bar"></div>
+          <h2>LOCAL MULTIPLAYER</h2>
+          <p class="room-intro">2-4 explorers share one screen. Pass the device when prompted so every decision stays secret.</p>
+          <label for="player-count">EXPLORERS</label>
+          <select id="player-count">
+            <option value="2">2 PLAYERS</option>
+            <option value="3">3 PLAYERS</option>
+            <option value="4" selected>4 PLAYERS</option>
+          </select>
+          <div id="local-player-names" class="local-player-names">
+            <label>PLAYER 1<input data-player-name value="YOU" maxlength="12"></label>
+            <label>PLAYER 2<input data-player-name value="ATU" maxlength="12"></label>
+            <label>PLAYER 3<input data-player-name value="MIRA" maxlength="12"></label>
+            <label>PLAYER 4<input data-player-name value="CUSCO" maxlength="12"></label>
+          </div>
+          <button id="start-local-button" class="menu-button primary">START LOCAL GAME</button>
+          <p class="room-note">No room code or network connection is required.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="rules-screen" class="screen">
+      <div class="stone-scene">
+        <div class="rules-card panel">
+          <button class="back-button" data-back="menu-screen">&larr; BACK</button>
+          <div class="pattern-bar"></div>
+          <h2>HOW TO PLAY</h2>
+          <div class="tutorial-shell">
+            <button id="tutorial-prev" class="tutorial-arrow" aria-label="Previous rule">&larr;</button>
+            <div id="tutorial-track" class="tutorial-track">
+              <article class="tutorial-slide">
+                <div class="tutorial-shot shot-board"><img src="assets/tutorial/01-board.png" alt="The exploration board"></div>
+                <div class="tutorial-copy"><span>01</span><h3>ENTER THE CAVE</h3><p>The game lasts five rounds. At the start of each round, every explorer pays one blue-gem deposit. One relic numbered 1-5 is shuffled into that round's deck.</p></div>
+              </article>
+              <article class="tutorial-slide">
+                <div class="tutorial-shot shot-treasure"><img src="assets/tutorial/02-treasure.png" alt="Treasure cards on the board"></div>
+                <div class="tutorial-copy"><span>02</span><h3>SPLIT TREASURE</h3><p>The 15 treasure cards are worth 1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15 and 17. Divide the value equally among explorers still inside; the remainder stays on that card.</p></div>
+              </article>
+              <article class="tutorial-slide">
+                <div class="tutorial-shot shot-choice"><img src="assets/tutorial/03-choice.png" alt="Secret continue or return choice"></div>
+                <div class="tutorial-copy"><span>03</span><h3>CHOOSE SECRETLY</h3><p>After every reveal, choose KEEP EXPLORING or RETURN TO TENT within eight seconds. In local multiplayer, pass the device and let each active explorer choose privately.</p></div>
+              </article>
+              <article class="tutorial-slide">
+                <div class="tutorial-shot shot-danger"><img src="assets/tutorial/04-danger.png" alt="Two matching danger cards end the round"></div>
+                <div class="tutorial-copy"><span>04</span><h3>WATCH FOR DANGER</h3><p>There are 15 danger cards: three each of fire, landslide, snakes, spiders and mummy. A second matching danger ends the round; explorers still inside lose their loot and deposit, and one matching danger card is removed from later rounds.</p></div>
+              </article>
+              <article class="tutorial-slide">
+                <div class="tutorial-shot shot-relic"><img src="assets/tutorial/05-relic.png" alt="A glowing relic card on the board"></div>
+                <div class="tutorial-copy"><span>05</span><h3>CLAIM RELICS</h3><p>There are five numbered relic cards with no separate powers. A relic can be claimed only when exactly one explorer returns. This edition scores its printed number x 10: relics 1-5 are worth 10, 20, 30, 40 and 50 points.</p></div>
+              </article>
+              <article class="tutorial-slide">
+                <div class="tutorial-shot shot-finish"><img src="assets/tutorial/06-final.png" alt="Tents surrounding the completed expedition board"></div>
+                <div class="tutorial-copy"><span>06</span><h3>REVEAL THE TENTS</h3><p>Safe loot, recovered deposits and claimed relics stay hidden in each tent. After round five, all totals are revealed and ranked. The explorer with the highest score wins.</p></div>
+              </article>
+            </div>
+            <button id="tutorial-next" class="tutorial-arrow" aria-label="Next rule">&rarr;</button>
+          </div>
+          <div id="tutorial-dots" class="tutorial-dots" aria-label="Tutorial pages"></div>
+          <p class="rules-spec">DECK: 15 TREASURE + 15 DANGER + 5 RELICS</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen">
+      <header class="game-header">
+        <button id="leave-game-button" class="small-button">MAIN MENU</button>
+        <div class="game-title-block">
+          <h2>INCA TREASURE</h2>
+          <p id="round-label">ROUND 1</p>
+        </div>
+        <div id="round-tabs" class="round-tabs"></div>
+        <div class="header-deposit">DEPOSIT 1 <span class="gem gem-blue"></span></div>
+      </header>
+
+      <div class="game-layout">
+        <aside id="player-you" class="player-panel player-red"></aside>
+        <section id="player-inventory" class="player-inventory panel" aria-label="Your inventory"></section>
+
+        <section class="board-wrap panel">
+          <div class="board-topline"><div id="turn-text">READY TO EXPLORE</div></div>
+          <div id="board" class="board" aria-label="Exploration board"></div>
+          <div class="gem-legend">
+            <span><i class="gem gem-blue"></i>= 1</span>
+            <span><i class="gem gem-black"></i>= 5</span>
+            <span><i class="gem gem-yellow"></i>= 10</span>
+          </div>
+        </section>
+
+        <aside class="decision-panel panel">
+          <div class="decision-kicker">CHOOSE SECRETLY</div>
+          <div id="timer-ring" class="timer-ring"><span id="timer-value">8</span></div>
+          <div class="seconds-label">SECONDS</div>
+          <h3 id="decision-title">READY</h3>
+          <p id="decision-copy">All explorers choose secretly.</p>
+          <button id="continue-button" class="choice-button continue">KEEP EXPLORING</button>
+          <button id="leave-button" class="choice-button leave">RETURN TO TENT</button>
+          <div class="reveal-label">Choices reveal together</div>
+          <div id="reveal-countdown" class="reveal-countdown"></div>
+        </aside>
+
+        <aside id="player-atu" class="player-panel player-blue"></aside>
+        <aside id="player-mira" class="player-panel player-gold"></aside>
+        <aside id="player-cusco" class="player-panel player-purple"></aside>
+      </div>
+
+      <div id="card-reveal-stage" class="card-reveal-stage hidden" aria-live="polite">
+        <div class="reveal-flare"></div>
+        <div id="featured-card" class="featured-card"></div>
+        <div id="featured-card-label" class="featured-card-label"></div>
+      </div>
+
+      <div id="choice-reveal-stage" class="choice-reveal-stage hidden" aria-live="assertive">
+        <div id="choice-results" class="choice-results"></div>
+      </div>
+
+      <div id="message-overlay" class="overlay hidden">
+        <div class="result-card panel">
+          <div class="pattern-bar"></div>
+          <h2 id="overlay-title"></h2>
+          <p id="overlay-message"></p>
+          <div id="overlay-details"></div>
+          <button id="overlay-button" class="menu-button primary">CONTINUE</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="final-screen" class="screen">
+      <div class="final-scene">
+        <header class="final-header">
+          <span>FINAL RESULTS</span>
+          <h2>EXPEDITION RANKING</h2>
+          <p>All tent wealth has been revealed</p>
+        </header>
+        <div id="final-ranking" class="final-ranking"></div>
+        <div class="final-actions">
+          <button id="final-replay-button" class="menu-button primary">PLAY AGAIN</button>
+          <button id="final-menu-button" class="menu-button">MAIN MENU</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

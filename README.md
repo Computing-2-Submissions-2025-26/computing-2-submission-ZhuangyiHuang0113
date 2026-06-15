@@ -1,53 +1,77 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/H6lPFq0J)
-# Computing 2 Coursework Submission.
-**CID**: [YOUR CID]
+# Inca Treasure
 
-This is the submission template for your Computing 2 Applications coursework submission.
+**CID:** Add your CID here before submitting.
 
-## Checklist
-### Install dependencies locally
-This template relies on a a few packages from the Node Package Manager, npm.
-To install them run the following commands in the terminal.
+This is a browser version of an Incan Gold / Diamant style treasure game. The
+player explores a cave over five rounds, collects gems, decides whether to keep
+going or return to camp, and tries not to get caught by a repeated danger card.
+
+The game logic is separated from the page code. The rules are in
+`web-app/IncaTreasure.js`, while `web-app/main.js` draws the screen, handles
+buttons and runs the small animations.
+
+This structure makes the rules easier to test. If the design changes later, the
+scoring and card rules stay in the same place.
+
+## Files to check
+
+- `web-app/index.html` - the page structure.
+- `web-app/default.css` - the layout, board and visual style.
+- `web-app/main.js` - browser code and UI state.
+- `web-app/IncaTreasure.js` - reusable game module with JSDoc comments.
+- `web-app/tests/IncaTreasure.test.js` - Mocha tests for the rules.
+- `web-app/tests/TEST-SPECIFICATION.md` - short test plan.
+
+The image assets are in `web-app/assets/`, including the tutorial
+screenshots used on the How To Play page.
+
+## Coursework checklist
+
+- [x] API module included in `web-app/IncaTreasure.js`.
+- [x] `jsdoc.json` points to the API module.
+- [x] JSDoc generated in `docs/`.
+- [x] Game module implemented and usable without the page.
+- [x] Unit test specification included in `web-app/tests/`.
+- [x] Mocha unit tests implemented.
+- [x] Web app implemented in `web-app/index.html`, `default.css` and `main.js`.
+- [x] `node_modules/` ignored by `.gitignore`.
+
+## How to run it
+
+Install the packages once:
+
 ```properties
 npm install
 ```
-These won't be uploaded to your repository because of the `.gitignore`.
-I'll run the same commands when I download your repos.
 
-### Game Module – API
-*You will produce an API specification, i.e. a list of function names and their signatures, for a Javascript module that represents the state of your game and the operations you can perform on it that advances the game or provides information.*
+Then run the checks:
 
-- [ ] Include a `.js ` module file in `/web-app` containing the API using `jsdoc`.
-- [ ] Update `/jsdoc.json` to point to this module in `.source.include` (line 7)
-- [ ] Compile jsdoc using the run configuration `Generate Docs`
-- [ ] Check the generated docs have compiled correctly.
+```properties
+npm test
+npm run docs
+npm run lint
+```
 
-### Game Module – Implementation
-*You will implement, in Javascript, the module you specified above. Such that your game can be simulated in code, e.g. in the debug console.*
+To play the game, open `web-app/index.html` in the browser. If the browser blocks
+local files, use a small local server from the project folder.
 
-- [ ] The file above should be fully implemented.
+## Rules module
 
-### Unit Tests – Specification
-*For the Game module API you have produced, write a set of unit tests descriptions that specify the expected behaviour of one aspect of your API, e.g. you might pick the win condition, or how the state changes when a move is made.*
+The public functions intended for marking are:
 
-- [ ] Write unit test definitions in `/web-app/tests`.
-- [ ] Check the headings appear in the Testing sidebar.
+- `createPlayers(options)`
+- `createRoundDeck(options)`
+- `preparePlayersForRound(players)`
+- `distributeTreasure(players, card)`
+- `settleReturningPlayers(players, revealed, leavingIds)`
+- `failRound(players, dangerPool, dangerName)`
+- `chooseBotAction(player, context)`
+- `scorePlayer(player)`
+- `rankPlayers(players)`
 
-### Unit Tests – Implementation
-*Implement in code the unit tests specified above.*
+These functions are kept away from the DOM so they can be tested without opening
+the game page. The generated JSDoc pages are written to `docs/` after running
+`npm run docs`.
 
-- [ ] Implement the tests above.
-
-### Web Application
-*Produce a web application that allows a user to interface with your game module.*
-
-- Implement in `/web-app`
-  - [ ] `index.html`
-  - [ ] `default.css`
-  - [ ] `main.js`
-  - [ ] Any other files you need to include.
-
-### Finally
-- [ ] Push to GitHub.
-- [ ] Sync the changes.
-- [ ] Check submission on GitHub website.
+Relics use this version's rule: the printed relic number is multiplied by 10, so
+relic 5 is worth 50 points.
