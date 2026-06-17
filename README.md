@@ -1,6 +1,6 @@
 # Inca Treasure
 
-**CID:** Add your CID here before submitting.
+**CID:** 02573495.
 
 This is a browser version of an Incan Gold / Diamant style treasure game. The
 player explores a cave over five rounds, collects gems, decides whether to keep
