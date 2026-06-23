@@ -44,6 +44,13 @@ const localNameInputs = [...document.querySelectorAll("[data-player-name]")];
 const tutorialTrack = document.querySelector("#tutorial-track");
 const tutorialSlides = [...document.querySelectorAll(".tutorial-slide")];
 const tutorialDots = document.querySelector("#tutorial-dots");
+const diceButton = document.querySelector("#dice-button");
+const diceValue = document.querySelector("#dice-value");
+const startFlag = document.querySelector("#start-flag");
+const pauseOverlay = document.querySelector("#pause-overlay");
+const settingsOverlay = document.querySelector("#settings-overlay");
+const soundButton = document.querySelector("#sound-button");
+const volumeSlider = document.querySelector("#volume-slider");
 
 const pathSlots = [0, 1, 2, 3, 4, 5, 6, 13, 20, 27, 34, 33, 32, 31, 30, 29, 28, 21, 14, 7];
 const dangerIcons = { FIRE: "F", LANDSLIDE: "L", SNAKES: "S", SPIDERS: "W", MUMMY: "M" };
@@ -55,6 +62,8 @@ const state = {
   phase: "menu",
   deck: [],
   revealed: [],
+  routeCards: [],
+  routeCursor: -1,
   dangerCounts: {},
   dangerPool: {},
   artifactPool: [...ARTIFACT_NUMBERS],
@@ -66,10 +75,13 @@ const state = {
   roundStartPlayer: 0,
   currentTurn: 0,
   gameMode: "bots",
-  localPlayerCount: 4,
-  localNames: ["YOU", "ATU", "MIRA", "CUSCO"],
+  localPlayerCount: 2,
+  localNames: ["", "", "", ""],
   localChoiceQueue: [],
-  localChoiceIndex: 0
+  localChoiceIndex: 0,
+  soundOn: true,
+  volume: 70,
+  paused: false
 };
 
 function showScreen(id) {
@@ -114,6 +126,8 @@ function startRound() {
   state.phase = "round-start";
   state.deck = buildDeck();
   state.revealed = [];
+  state.routeCards = Array(pathSlots.length).fill(null);
+  state.routeCursor = -1;
   state.dangerCounts = {};
   state.playerChoice = null;
   state.currentTurn = state.roundStartPlayer % state.players.length;
@@ -121,7 +135,7 @@ function startRound() {
   renderAll();
   showResult(
     `ROUND ${state.round}`,
-    "Each explorer pays one blue gem as a deposit. Return safely to recover it.",
+    "Each explorer must offer one blue gem to enter the cave. Only those who return safely may reclaim it.",
     "",
     "ENTER THE CAVE",
     () => {
@@ -159,10 +173,11 @@ function renderPlayers() {
     const panel = document.querySelector(`#player-${id}`);
     if (panel) panel.classList.toggle("unused", !state.players.some(player => player.id === id));
   });
-  state.players.forEach(player => {
+  state.players.forEach((player, index) => {
     const panel = document.querySelector(`#player-${player.id}`);
     if (!panel) return;
     panel.className = `player-panel player-${player.color}${player.active ? "" : " out"}`;
+    panel.classList.toggle("current-turn", player.active && index === state.currentTurn && ["ready", "rolling"].includes(state.phase));
     const revealChoice = state.phase === "resolving";
     const choiceText = revealChoice && player.choice === "continue" ? "KEEP EXPLORING" : revealChoice && player.choice === "leave" ? "RETURN TO TENT" : "";
     const choiceClass = player.choice ? ` choice-${player.choice}` : "";
@@ -197,11 +212,13 @@ function renderBoard() {
     const slot = document.createElement("div");
     const pathIndex = pathSlots.indexOf(index);
     slot.className = `board-slot${pathIndex >= 0 ? " path" : ""}`;
-    if (pathIndex === state.revealed.length - 1) slot.classList.add("current");
+    if (pathIndex === state.routeCursor) slot.classList.add("current");
+    if (pathIndex === 0 && state.routeCursor < 0) slot.classList.add("start");
 
     if (pathIndex >= 0) {
-      if (pathIndex < state.revealed.length) {
-        slot.append(createCardElement(state.revealed[pathIndex]));
+      const card = state.routeCards[pathIndex];
+      if (card) {
+        slot.append(createCardElement(card));
       } else {
         const back = document.createElement("div");
         back.className = "card back";
@@ -219,7 +236,7 @@ function createCardElement(card) {
   if (card.type === "treasure") {
     el.innerHTML = `
       <div class="card-type">TREASURE</div>
-      <img class="card-gem" src="assets/gem-${gemColorForValue(card.value)}.png" alt="">
+      <div class="card-gems">${gemMarkupForValue(card.value)}</div>
       <div class="card-value">${card.value}</div>
       <span class="card-leftover">LEFT ${card.leftover}</span>
     `;
@@ -246,26 +263,56 @@ function gemColorForValue(value) {
   return "blue";
 }
 
+function gemMarkupForValue(value) {
+  const yellow = Math.floor(value / 10);
+  const black = Math.floor((value % 10) / 5);
+  const blue = value % 5;
+  const gems = [
+    ...Array(yellow).fill("yellow"),
+    ...Array(black).fill("black"),
+    ...Array(blue).fill("blue")
+  ];
+  return gems.map(color => `<i class="gem gem-${color}"></i>`).join("");
+}
+
 function setReadyToReveal() {
-  // The old manual "draw next card" button was removed, so the next reveal is automatic.
+  // The dice keeps the next reveal in the player's hands instead of auto-playing.
   state.phase = "ready";
   decisionPanel.dataset.phase = "ready";
   decisionKicker.textContent = "READY TO EXPLORE";
   const explorer = state.players[state.currentTurn];
-  turnText.textContent = `${explorer.name} REVEALS A CARD`;
-  decisionTitle.textContent = "KEEP EXPLORING";
-  decisionCopy.textContent = "The next card will be revealed automatically.";
-  timerValue.textContent = "08";
+  turnText.textContent = `${explorer.name} ROLLS THE DICE`;
+  decisionTitle.textContent = explorer.isBot ? `${explorer.name} IS ROLLING` : "ROLL THE DICE";
+  decisionCopy.textContent = explorer.isBot ? "The explorer is choosing a path." : "Click the dice above your pack to move and reveal.";
+  timerValue.textContent = "";
   continueButton.classList.add("hidden");
   leaveButton.classList.add("hidden");
   revealCountdown.textContent = "";
+  diceValue.textContent = "?";
+  diceButton.classList.remove("hidden", "rolling");
+  diceButton.disabled = false;
+  startFlag.classList.toggle("hidden", state.routeCursor >= 0);
   renderPlayers();
-  window.setTimeout(revealCard, 650);
+  if (explorer.isBot) {
+    diceButton.disabled = true;
+    window.setTimeout(rollDiceAndMove, 900);
+  }
 }
 
-function revealCard() {
-  // Cards are popped from the deck and then resolved by card type.
+function rollDiceAndMove() {
   if (state.phase !== "ready") return;
+  state.phase = "rolling";
+  diceButton.disabled = true;
+  diceButton.classList.add("rolling");
+  const roll = Math.floor(Math.random() * 6) + 1;
+  diceValue.textContent = roll;
+  turnText.textContent = `${state.players[state.currentTurn].name} ROLLED ${roll}`;
+  window.setTimeout(() => revealCardAtRoll(roll), 700);
+}
+
+function revealCardAtRoll(roll) {
+  // The roll moves around the path. New spaces reveal cards; old spaces replay them.
+  if (state.phase !== "rolling") return;
   if (!state.deck.length || state.revealed.length >= pathSlots.length) {
     endRoundSafely("The cave has been fully explored!");
     return;
@@ -273,9 +320,18 @@ function revealCard() {
 
   state.phase = "revealing";
   decisionPanel.dataset.phase = "revealing";
+  state.routeCursor = (state.routeCursor + roll + pathSlots.length) % pathSlots.length;
+  const existingCard = state.routeCards[state.routeCursor];
+  renderBoard();
+
+  if (existingCard) {
+    showFeaturedCard(existingCard, () => resolveRevisitedCard(existingCard));
+    return;
+  }
+
   const card = state.deck.pop();
-  state.revealed.push(card);
-  state.currentTurn = nextActivePlayerIndex(state.currentTurn);
+  state.routeCards[state.routeCursor] = card;
+  state.revealed = state.routeCards.filter(Boolean);
   showFeaturedCard(card, () => resolveRevealedCard(card));
 }
 
@@ -300,6 +356,20 @@ function resolveRevealedCard(card) {
 
   renderPlayers();
   renderInventory();
+  state.currentTurn = nextActivePlayerIndex(state.currentTurn);
+  beginDecision();
+}
+
+function resolveRevisitedCard(card) {
+  renderBoard();
+  turnText.textContent = card.type === "treasure"
+    ? `REVISITED TREASURE ${card.value}`
+    : card.type === "danger"
+      ? `REVISITED ${card.name}`
+      : `REVISITED RELIC ${card.number}`;
+  renderPlayers();
+  renderInventory();
+  state.currentTurn = nextActivePlayerIndex(state.currentTurn);
   beginDecision();
 }
 
@@ -314,6 +384,7 @@ function showFeaturedCard(card, onComplete) {
   cardRevealStage.classList.remove("hidden", "flying");
   featuredCard.getAnimations().forEach(animation => animation.cancel());
 
+  const holdTime = card.type === "treasure" ? 4000 : 2300;
   window.setTimeout(() => {
     cardRevealStage.classList.add("flying");
     featuredCard.animate(
@@ -323,14 +394,14 @@ function showFeaturedCard(card, onComplete) {
       ],
       { duration: 520, easing: "cubic-bezier(.4,0,.8,.2)", fill: "forwards" }
     );
-  }, 900);
+  }, holdTime);
 
   window.setTimeout(() => {
     cardRevealStage.classList.add("hidden");
     cardRevealStage.classList.remove("flying");
     featuredCard.replaceChildren();
     onComplete();
-  }, 1430);
+  }, holdTime + 560);
 }
 
 function distributeTreasure(card) {
@@ -525,6 +596,10 @@ function settleLeavingPlayers(leaving) {
   );
   state.players = result.players;
   state.revealed = result.revealed;
+  const updatedCards = [...state.revealed];
+  state.routeCards = state.routeCards.map(card => {
+    return card ? updatedCards.shift() : null;
+  });
   renderBoard();
   renderInventory();
 }
@@ -647,8 +722,68 @@ function clearTimer() {
   state.timer = null;
 }
 
+function returnToMenu() {
+  clearTimer();
+  hideResult();
+  pauseOverlay.classList.add("hidden");
+  settingsOverlay.classList.add("hidden");
+  diceButton.classList.add("hidden");
+  showScreen("menu-screen");
+}
+
+function pauseGame() {
+  if (!document.querySelector("#game-screen").classList.contains("active")) return;
+  if (["game-over", "menu"].includes(state.phase)) return;
+  state.paused = true;
+  clearTimer();
+  document.querySelector("#game-screen").classList.add("paused");
+  pauseOverlay.classList.remove("hidden");
+}
+
+function resumeDecisionTimer() {
+  if (state.phase !== "decision") return;
+  clearTimer();
+  state.timer = window.setInterval(() => {
+    state.seconds -= 1;
+    timerValue.textContent = String(state.seconds).padStart(2, "0");
+    if (state.gameMode !== "local" && state.seconds <= 3) {
+      revealCountdown.textContent = state.seconds || "REVEAL";
+    }
+    if (state.seconds <= 0) {
+      if (state.gameMode === "local") choose("continue");
+      else {
+        if (!state.playerChoice) state.playerChoice = "continue";
+        resolveChoices();
+      }
+    }
+  }, 1000);
+}
+
+function resumeGame() {
+  state.paused = false;
+  pauseOverlay.classList.add("hidden");
+  document.querySelector("#game-screen").classList.remove("paused");
+  resumeDecisionTimer();
+}
+
+function syncLocalNameInputs() {
+  const count = Number(playerCountSelect.value);
+  state.localPlayerCount = count;
+  localNameInputs.forEach((input, index) => {
+    input.closest("label").classList.toggle("hidden", index >= count);
+  });
+}
+
+function updateSoundButton() {
+  soundButton.textContent = state.soundOn ? "SOUND ON" : "SOUND OFF";
+  soundButton.classList.toggle("muted", !state.soundOn);
+}
+
 document.querySelector("#solo-button").addEventListener("click", () => startGame("bots"));
-document.querySelector("#room-button").addEventListener("click", () => showScreen("room-screen"));
+document.querySelector("#room-button").addEventListener("click", () => {
+  syncLocalNameInputs();
+  showScreen("room-screen");
+});
 document.querySelector("#rules-button").addEventListener("click", () => showScreen("rules-screen"));
 document.querySelectorAll("[data-back]").forEach(button => {
   button.addEventListener("click", () => showScreen(button.dataset.back));
@@ -658,24 +793,26 @@ document.querySelector("#start-local-button").addEventListener("click", () => {
   state.localNames = localNameInputs.slice(0, state.localPlayerCount).map((input, index) => input.value.trim() || `PLAYER ${index + 1}`);
   startGame("local");
 });
-playerCountSelect.addEventListener("change", () => {
-  const count = Number(playerCountSelect.value);
-  localNameInputs.forEach((input, index) => {
-    input.closest("label").classList.toggle("hidden", index >= count);
-  });
-});
-document.querySelector("#leave-game-button").addEventListener("click", () => {
-  clearTimer();
-  hideResult();
-  showScreen("menu-screen");
-});
+playerCountSelect.addEventListener("change", syncLocalNameInputs);
+document.querySelector("#leave-game-button").addEventListener("click", returnToMenu);
 document.querySelector("#fullscreen-button").addEventListener("click", () => {
   if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
   else document.exitFullscreen?.();
 });
-document.querySelector("#sound-button").addEventListener("click", event => {
-  event.currentTarget.textContent = event.currentTarget.textContent === "ON" ? "OFF" : "ON";
+soundButton.addEventListener("click", () => {
+  state.soundOn = !state.soundOn;
+  updateSoundButton();
 });
+volumeSlider.addEventListener("input", event => {
+  state.volume = Number(event.target.value);
+  state.soundOn = state.volume > 0;
+  updateSoundButton();
+});
+document.querySelector("#pause-button").addEventListener("click", pauseGame);
+document.querySelector("#resume-button").addEventListener("click", resumeGame);
+document.querySelector("#pause-menu-button").addEventListener("click", returnToMenu);
+document.querySelector("#game-settings-button").addEventListener("click", () => settingsOverlay.classList.remove("hidden"));
+document.querySelector("#settings-close-button").addEventListener("click", () => settingsOverlay.classList.add("hidden"));
 document.querySelector("#final-replay-button").addEventListener("click", () => startGame(state.gameMode));
 document.querySelector("#final-menu-button").addEventListener("click", () => showScreen("menu-screen"));
 const menuChoices = [...document.querySelectorAll(".menu-card > .menu-button")];
@@ -688,6 +825,7 @@ menuChoices.forEach(button => {
 });
 continueButton.addEventListener("click", () => choose("continue"));
 leaveButton.addEventListener("click", () => choose("leave"));
+diceButton.addEventListener("click", rollDiceAndMove);
 overlayButton.addEventListener("click", () => {
   const action = state.pendingAction;
   state.pendingAction = null;
@@ -724,5 +862,7 @@ document.querySelector("#tutorial-prev").addEventListener("click", () => updateT
 document.querySelector("#tutorial-next").addEventListener("click", () => updateTutorial(tutorialIndex() + 1));
 tutorialTrack.addEventListener("scroll", syncTutorialDots, { passive: true });
 syncTutorialDots();
+syncLocalNameInputs();
+updateSoundButton();
 
 showScreen("menu-screen");

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inca Treasure</title>
+  <title>Temple Trail</title>
   <link rel="stylesheet" href="default.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
         <div class="ruins"></div>
         <div class="menu-card panel">
           <div class="pattern-bar"></div>
-          <h1>MAIN MENU</h1>
+          <h1>TEMPLE TRAIL</h1>
           <button id="solo-button" class="menu-button">
             <span>PLAY WITH BOTS</span>
             <small>YOU + 3 EXPLORER BOTS</small>
@@ -22,8 +22,8 @@
           <button id="room-button" class="menu-button">LOCAL MULTIPLAYER</button>
           <button id="rules-button" class="menu-button">HOW TO PLAY</button>
           <div class="menu-footer">
-            <button id="sound-button" class="icon-button" aria-label="Toggle sound">ON</button>
-            <button id="fullscreen-button" class="icon-button" aria-label="Fullscreen">FS</button>
+            <button id="sound-button" class="icon-button sound-toggle" aria-label="Toggle background sound">SOUND ON</button>
+            <button id="fullscreen-button" class="icon-button fullscreen-toggle" aria-label="Fullscreen">FULL SCREEN</button>
           </div>
         </div>
       </div>
@@ -38,15 +38,15 @@
           <p class="room-intro">2-4 explorers share one screen. Pass the device when prompted so every decision stays secret.</p>
           <label for="player-count">EXPLORERS</label>
           <select id="player-count">
-            <option value="2">2 PLAYERS</option>
+            <option value="2" selected>2 PLAYERS</option>
             <option value="3">3 PLAYERS</option>
-            <option value="4" selected>4 PLAYERS</option>
+            <option value="4">4 PLAYERS</option>
           </select>
           <div id="local-player-names" class="local-player-names">
-            <label>PLAYER 1<input data-player-name value="YOU" maxlength="12"></label>
-            <label>PLAYER 2<input data-player-name value="ATU" maxlength="12"></label>
-            <label>PLAYER 3<input data-player-name value="MIRA" maxlength="12"></label>
-            <label>PLAYER 4<input data-player-name value="CUSCO" maxlength="12"></label>
+            <label>PLAYER 1<input data-player-name placeholder="Please Enter Your Name" maxlength="12"></label>
+            <label>PLAYER 2<input data-player-name placeholder="Please Enter Your Name" maxlength="12"></label>
+            <label>PLAYER 3<input data-player-name placeholder="Please Enter Your Name" maxlength="12"></label>
+            <label>PLAYER 4<input data-player-name placeholder="Please Enter Your Name" maxlength="12"></label>
           </div>
           <button id="start-local-button" class="menu-button primary">START LOCAL GAME</button>
           <p class="room-note">No room code or network connection is required.</p>
@@ -65,7 +65,7 @@
             <div id="tutorial-track" class="tutorial-track">
               <article class="tutorial-slide">
                 <div class="tutorial-shot shot-board"><img src="assets/tutorial/01-board.png" alt="The exploration board"></div>
-                <div class="tutorial-copy"><span>01</span><h3>ENTER THE CAVE</h3><p>The game lasts five rounds. At the start of each round, every explorer pays one blue-gem deposit. One relic numbered 1-5 is shuffled into that round's deck.</p></div>
+                <div class="tutorial-copy"><span>01</span><h3>BEGIN THE ADVENTURE</h3><p>The adventure unfolds over five rounds. At the beginning of each round, every explorer who dares to enter the cave must offer one blue gem as a deposit. Then, one ancient treasure card numbered 1-5 is secretly added to that round's deck.</p></div>
               </article>
               <article class="tutorial-slide">
                 <div class="tutorial-shot shot-treasure"><img src="assets/tutorial/02-treasure.png" alt="Treasure cards on the board"></div>
@@ -100,11 +100,15 @@
       <header class="game-header">
         <button id="leave-game-button" class="small-button">MAIN MENU</button>
         <div class="game-title-block">
-          <h2>INCA TREASURE</h2>
+          <h2>TEMPLE TRAIL</h2>
           <p id="round-label">ROUND 1</p>
         </div>
         <div id="round-tabs" class="round-tabs"></div>
         <div class="header-deposit">DEPOSIT 1 <span class="gem gem-blue"></span></div>
+        <div class="game-actions" aria-label="Game controls">
+          <button id="game-settings-button" class="round-icon-button" aria-label="Open settings">⚙</button>
+          <button id="pause-button" class="round-icon-button" aria-label="Pause game">Ⅱ</button>
+        </div>
       </header>
 
       <div class="game-layout">
@@ -113,6 +117,11 @@
 
         <section class="board-wrap panel">
           <div class="board-topline"><div id="turn-text">READY TO EXPLORE</div></div>
+          <div id="start-flag" class="start-flag" aria-hidden="true">START</div>
+          <button id="dice-button" class="dice-button hidden" type="button" aria-label="Roll the dice">
+            <span id="dice-value">?</span>
+            <small>ROLL</small>
+          </button>
           <div id="board" class="board" aria-label="Exploration board"></div>
           <div class="gem-legend">
             <span><i class="gem gem-blue"></i>= 1</span>
@@ -155,6 +164,31 @@
           <p id="overlay-message"></p>
           <div id="overlay-details"></div>
           <button id="overlay-button" class="menu-button primary">CONTINUE</button>
+        </div>
+      </div>
+
+      <div id="pause-overlay" class="overlay hidden">
+        <div class="pause-card panel">
+          <div class="pattern-bar"></div>
+          <h2>PAUSED</h2>
+          <button id="resume-button" class="menu-button primary">CONTINUE GAME</button>
+          <button id="pause-menu-button" class="menu-button">⌂ MAIN MENU</button>
+        </div>
+      </div>
+
+      <div id="settings-overlay" class="overlay hidden">
+        <div class="settings-card panel">
+          <div class="pattern-bar"></div>
+          <h2>SETTINGS</h2>
+          <label class="volume-control">BACKGROUND SOUND
+            <input id="volume-slider" type="range" min="0" max="100" value="70">
+          </label>
+          <div class="quick-rules">
+            <h3>RULES HANDBOOK</h3>
+            <p>The adventure unfolds over five rounds. Each explorer must offer one blue gem to enter the cave. Only those who return safely may reclaim it.</p>
+            <p>There are 15 danger cards: three each of fire, landslide, snakes, spiders and mummy. A second matching danger ends the round.</p>
+          </div>
+          <button id="settings-close-button" class="menu-button primary">BACK TO GAME</button>
         </div>
       </div>
     </section>

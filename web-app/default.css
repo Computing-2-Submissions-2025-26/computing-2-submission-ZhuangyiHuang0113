@@ -2237,3 +2237,290 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
     grid-template-columns: 1fr;
   }
 }
+
+/* Requested playability updates. */
+.menu-footer {
+  align-items: center;
+}
+
+.icon-button.sound-toggle,
+.icon-button.fullscreen-toggle {
+  width: auto;
+  min-width: 128px;
+  padding: 0 14px;
+  font-size: 14px;
+  letter-spacing: .04em;
+}
+
+.icon-button.muted {
+  color: #fff8df;
+  background: linear-gradient(#c95838, #a9442d);
+}
+
+.room-card input::placeholder {
+  color: rgba(59, 40, 26, .45);
+  letter-spacing: 0;
+}
+
+.game-actions {
+  position: absolute;
+  top: 2%;
+  right: -20%;
+  display: flex;
+  gap: 10px;
+}
+
+.round-icon-button {
+  display: grid;
+  width: clamp(38px, 3vw, 52px);
+  height: clamp(38px, 3vw, 52px);
+  place-items: center;
+  border: 3px solid var(--line);
+  border-radius: 50%;
+  color: #fff7d8;
+  background: #ad4c31;
+  box-shadow: 0 3px 0 rgba(65,41,19,.32);
+  font: 900 clamp(18px, 1.5vw, 26px) Arial, sans-serif;
+}
+
+.round-icon-button:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.player-panel {
+  width: 14.6%;
+  height: 28.6%;
+}
+
+#player-you,
+#player-atu {
+  left: 2%;
+}
+
+#player-mira,
+#player-cusco {
+  right: 2%;
+}
+
+#player-atu,
+#player-cusco {
+  top: 55.1%;
+}
+
+.player-panel h3 {
+  font-size: clamp(19px, 1.55vw, 29px);
+}
+
+.player-panel .tent {
+  width: 78%;
+  height: 49%;
+}
+
+.player-panel p:nth-of-type(1) {
+  font-size: clamp(10px, .86vw, 15px);
+}
+
+.player-panel.current-turn {
+  transform: scale(1.035);
+  animation: active-player-ring 1.8s linear infinite;
+}
+
+@keyframes active-player-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255,255,255,.9), 6px 7px 0 rgba(68,43,20,.22), inset 0 0 0 7px var(--player-accent); }
+  50% { box-shadow: 0 0 0 8px rgba(255,255,255,.25), 6px 7px 0 rgba(68,43,20,.22), inset 0 0 0 7px var(--player-accent); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,.9), 6px 7px 0 rgba(68,43,20,.22), inset 0 0 0 7px var(--player-accent); }
+}
+
+.board-wrap {
+  left: 19%;
+  width: 49%;
+  height: 59.5%;
+}
+
+.board {
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: .7%;
+}
+
+.card {
+  width: 94%;
+  height: 94%;
+}
+
+.card-type {
+  font-size: clamp(8px, .78vw, 14px);
+}
+
+.card-value {
+  font-size: clamp(20px, 1.85vw, 34px);
+}
+
+.card-gems {
+  display: flex;
+  max-width: 84%;
+  min-height: 38%;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 2% auto 0;
+}
+
+.card-gems .gem {
+  width: clamp(15px, 1.25vw, 23px);
+  height: clamp(15px, 1.25vw, 23px);
+}
+
+.featured-card .card-gems {
+  min-height: 41%;
+  gap: 6px;
+}
+
+.featured-card .card-gems .gem {
+  width: clamp(28px, 2.2vw, 42px);
+  height: clamp(28px, 2.2vw, 42px);
+  animation: gem-fly-in .72s cubic-bezier(.18,.88,.28,1.18) both;
+}
+
+.featured-card .card-gems .gem:nth-child(2n) {
+  animation-delay: .08s;
+}
+
+.featured-card .card-gems .gem:nth-child(3n) {
+  animation-delay: .16s;
+}
+
+@keyframes gem-fly-in {
+  from {
+    opacity: 0;
+    transform: translate(-90px, -70px) scale(.25) rotate(-35deg);
+    filter: drop-shadow(38px 20px 0 rgba(255,231,119,.35));
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0);
+    filter: drop-shadow(0 3px 1px rgba(48,27,14,.38));
+  }
+}
+
+.decision-panel {
+  left: 69.5%;
+}
+
+.dice-button {
+  position: absolute;
+  z-index: 8;
+  top: 36.5%;
+  left: 43%;
+  display: grid;
+  width: clamp(78px, 6vw, 112px);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 4px solid #4b3120;
+  border-radius: 18px;
+  color: #a9442d;
+  background: linear-gradient(#fff7d8, #f3d47e);
+  box-shadow: 0 8px 0 rgba(72,45,20,.35), 0 0 0 7px rgba(255,244,198,.45);
+  font: 900 clamp(34px, 3.1vw, 58px) Arial, sans-serif;
+  animation: dice-prompt .82s ease-in-out infinite alternate;
+}
+
+.dice-button small {
+  margin-top: -12%;
+  color: #315f52;
+  font-size: clamp(10px, .75vw, 14px);
+  letter-spacing: .15em;
+}
+
+.dice-button.rolling {
+  animation: dice-roll .7s ease-in-out both;
+}
+
+.dice-button:disabled {
+  cursor: wait;
+}
+
+@keyframes dice-prompt {
+  from { transform: scale(.95); }
+  to { transform: scale(1.05); }
+}
+
+@keyframes dice-roll {
+  0% { transform: rotate(0) scale(1); }
+  30% { transform: rotate(14deg) scale(1.08); }
+  60% { transform: rotate(-12deg) scale(.98); }
+  100% { transform: rotate(0) scale(1); }
+}
+
+.start-flag {
+  position: absolute;
+  z-index: 7;
+  top: 1.5%;
+  left: 1.5%;
+  padding: 6px 9px;
+  border: 2px solid #4a301e;
+  border-radius: 5px;
+  color: #fff8da;
+  background: #ad4c31;
+  box-shadow: 0 3px 0 rgba(65,41,19,.32);
+  font: 900 clamp(10px, .8vw, 14px) Arial, sans-serif;
+  letter-spacing: .1em;
+}
+
+.board-slot.start {
+  outline: 4px solid #ad4c31;
+  outline-offset: -5px;
+}
+
+#game-screen.paused .game-layout,
+#game-screen.paused .game-header,
+#game-screen.paused .card-reveal-stage {
+  filter: grayscale(.25) brightness(.72);
+}
+
+.pause-card,
+.settings-card {
+  width: min(560px, 92vw);
+  padding: 0 42px 30px;
+  text-align: center;
+}
+
+.pause-card h2,
+.settings-card h2 {
+  color: var(--red);
+  font-size: clamp(36px, 4vw, 58px);
+}
+
+.volume-control {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+  font-weight: 900;
+}
+
+.volume-control input {
+  width: 100%;
+}
+
+.quick-rules {
+  margin: 18px 0;
+  padding: 16px;
+  border: 2px solid #b98f4f;
+  border-radius: 8px;
+  background: #fff9e8;
+  text-align: left;
+}
+
+.quick-rules h3 {
+  margin-bottom: 8px;
+  color: var(--teal-dark);
+}
+
+.quick-rules p {
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.45;
+}
