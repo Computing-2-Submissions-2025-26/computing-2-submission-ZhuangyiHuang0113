@@ -16,7 +16,7 @@ describe("Temple Treasure game module", function () {
             players[0].roundLoot = 9;
             players[0].active = false;
             const result = preparePlayersForRound(players);
-            assert.equal(result[0].tent, 4);
+            assert.equal(result[0].tent, 3);
             assert.equal(result[0].wallet, 3);
             assert.equal(result[0].roundLoot, 0);
             assert.equal(result[0].active, true);
@@ -31,6 +31,15 @@ describe("Temple Treasure game module", function () {
             assert.equal(result[1].active, false);
             assert.equal(result[1].wallet, 4);
             assert.equal(result[1].dropped, true);
+        });
+
+        it("drops final-round explorers who cannot pay the deposit", function () {
+            const players = createPlayers();
+            players[0].tent = 0;
+            const result = preparePlayersForRound(players, {round: 5});
+            assert.equal(result[0].active, false);
+            assert.equal(result[0].dropped, true);
+            assert.equal(result[0].tent, 0);
         });
 
         it("builds 15 treasure, 15 danger and one numbered relic", function () {
@@ -58,7 +67,7 @@ describe("Temple Treasure game module", function () {
     });
 
     describe("treasure distribution", function () {
-        it("splits treasure among active explorers and leaves the remainder", function () {
+        it("adds treasure to the route pool instead of giving it immediately", function () {
             const players = createPlayers();
             const result = distributeTreasure(
                 players,
@@ -68,34 +77,38 @@ describe("Temple Treasure game module", function () {
                 result.players.map(function (player) {
                     return player.roundLoot;
                 }),
-                [3, 3, 3, 3]
+                [0, 0, 0, 0]
             );
-            assert.equal(result.card.leftover, 3);
-            assert.equal(result.share, 3);
+            assert.equal(result.card.leftover, 15);
+            assert.equal(result.card.collected, false);
+            assert.equal(result.share, 0);
         });
 
-        it("does not give treasure to explorers already at camp", function () {
+        it("keeps accumulating treasure on an already-valued route card", function () {
             const players = createPlayers();
-            players[3].active = false;
             const result = distributeTreasure(
                 players,
-                {type: "treasure", value: 11, leftover: 0}
+                {type: "treasure", value: 11, leftover: 4}
             );
-            assert.deepEqual(
-                result.players.map(function (player) {
-                    return player.roundLoot;
-                }),
-                [3, 3, 3, 0]
+            assert.equal(result.card.leftover, 15);
+        });
+
+        it("adds a revisited treasure value to the route pool again", function () {
+            const players = createPlayers();
+            const first = distributeTreasure(
+                players,
+                {type: "treasure", value: 7, leftover: 0}
             );
-            assert.equal(result.card.leftover, 2);
+            const second = distributeTreasure(players, first.card);
+            assert.equal(second.card.leftover, 14);
         });
     });
 
     describe("returning to camp", function () {
         it("secures loot and route leftovers without scoring the returned deposit", function () {
             const players = createPlayers();
+            players[0] = {...players[0], tent: 3, wallet: 3};
             players[0].roundLoot = 8;
-            players[0].wallet = 3;
             const result = settleReturningPlayers(
                 players,
                 [{type: "treasure", value: 7, leftover: 3}],
@@ -109,6 +122,8 @@ describe("Temple Treasure game module", function () {
 
         it("awards numbered relic points only to a single returning explorer", function () {
             const players = createPlayers();
+            players[0] = {...players[0], tent: 3, wallet: 3};
+            players[1] = {...players[1], tent: 3, wallet: 3};
             const route = [{
                 type: "artifact",
                 number: 3,
@@ -128,11 +143,34 @@ describe("Temple Treasure game module", function () {
             assert.equal(group.players[0].tent, 4);
             assert.equal(group.players[0].artifacts.length, 0);
         });
+
+        it("splits the whole route pool and leaves only the global remainder", function () {
+            const players = createPlayers();
+            players[0] = {...players[0], tent: 3, wallet: 3};
+            players[1] = {...players[1], tent: 3, wallet: 3};
+            const result = settleReturningPlayers(
+                players,
+                [
+                    {type: "treasure", value: 4, leftover: 4},
+                    {type: "treasure", value: 7, leftover: 7}
+                ],
+                ["you", "atu"]
+            );
+            assert.equal(result.players[0].tent, 9);
+            assert.equal(result.players[1].tent, 9);
+            assert.deepEqual(result.revealed.map(function (card) {
+                return card.leftover;
+            }), [0, 1]);
+            assert.deepEqual(result.revealed.map(function (card) {
+                return card.collected;
+            }), [true, true]);
+        });
     });
 
     describe("danger and ranking", function () {
         it("removes carried loot, loses the deposit and removes that danger type", function () {
             const players = createPlayers();
+            players[0].tent = 3;
             players[0].roundLoot = 12;
             const result = failRound(
                 players,

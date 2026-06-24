@@ -63,7 +63,15 @@ const bgmTracks = Object.freeze({
   menu: "assets/audio/menu-bgm.mp3",
   game: "assets/audio/game-bgm.mp3"
 });
-const pathSlots = Array.from({length: 21}, (_, index) => index).filter(index => index !== 10);
+const sfxTracks = Object.freeze({
+  out: "assets/audio/out-bgm.mp3",
+  death: "assets/audio/death-bgm.mp3"
+});
+const pathSlots = Object.freeze([
+  0, 1, 2, 3, 4, 5, 6,
+  13, 12, 11, 9, 8, 7,
+  14, 15, 16, 17, 18, 19, 20
+]);
 const dangerIcons = { FIRE: "F", LANDSLIDE: "L", SNAKES: "S", SPIDERS: "W", MUMMY: "M" };
 const dangerArtFiles = Object.freeze({
   FIRE: "assets/danger/fire.jpg",
@@ -124,6 +132,8 @@ const state = {
   soundOn: true,
   volume: 60,
   audioElement: null,
+  sfxElement: null,
+  resultSoundEffect: null,
   audioMode: "menu",
   pausedPhase: null,
   roundStartTent: {},
@@ -196,10 +206,29 @@ function startRound() {
   state.dangerCounts = {};
   state.playerChoice = null;
   state.currentTurn = state.roundStartPlayer % state.players.length;
-  state.players = preparePlayersForRound(state.players);
   state.roundStartTent = Object.fromEntries(state.players.map(player => [player.id, player.tent]));
+  const beforeRoundPlayers = state.players.map(player => ({...player}));
+  state.players = preparePlayersForRound(state.players, {round: state.round});
+  const eliminated = state.players.filter(player => {
+    const before = beforeRoundPlayers.find(candidate => candidate.id === player.id);
+    return before && !before.dropped && player.dropped;
+  });
   state.currentTurn = nextActivePlayerIndex(state.currentTurn - 1);
   renderAll();
+  if (eliminated.length) {
+    showOutPlayers(eliminated, () => {
+      if (!activeExplorers().length) {
+        showFinalRanking();
+        return;
+      }
+      showRoundStartPrompt();
+    });
+    return;
+  }
+  showRoundStartPrompt();
+}
+
+function showRoundStartPrompt() {
   showResult(
     `ROUND ${state.round}`,
     "Each explorer pays one blue gem from their starting fund to enter the cave. Safe explorers recover it; explorers caught by danger lose that point.",
@@ -263,7 +292,8 @@ function renderPlayers() {
       ${createCharacterFigure(player.character, player.color, "panel-character")}
       <p><b>TENT WEALTH: HIDDEN</b></p>
       <p class="round-loot">ROUND LOOT ${player.roundLoot}</p>
-      <span class="choice-badge${choiceClass}">${player.dropped ? "LEFT GAME" : player.active ? choiceText : "RETURNED TO TENT"}</span>
+      ${player.dropped ? `<span class="out-stamp">OUT</span>` : ""}
+      <span class="choice-badge${choiceClass}">${player.dropped ? "" : player.active ? choiceText : "RETURNED TO TENT"}</span>
     `;
   });
 }
@@ -315,9 +345,9 @@ function renderInventory() {
 }
 
 function currentRoundPackTotal(player) {
-  if (player.active) return player.roundLoot;
   const roundStart = state.roundStartTent[player.id] || 0;
-  return player.tent - roundStart;
+  const routePool = player.active ? unclaimedRouteTreasure() : 0;
+  return player.tent - roundStart + player.roundLoot + routePool;
 }
 
 function inventoryPlayer() {
@@ -335,6 +365,7 @@ function shouldHideInventory() {
 function renderBoard() {
   // Twenty fixed card spaces. The dice moves through them in reading order.
   boardEl.innerHTML = "";
+  renderRouteGuidePath();
   for (let index = 0; index < 21; index += 1) {
     const slot = document.createElement("div");
     const pathIndex = pathSlots.indexOf(index);
@@ -369,6 +400,30 @@ function renderBoard() {
   }
 }
 
+function renderRouteGuidePath() {
+  const guide = document.createElement("div");
+  guide.className = "route-guide-path";
+  guide.innerHTML = `
+    <span class="route-dash route-entry top-entry"></span>
+
+    <span class="route-dash route-turn right-turn">
+      <i class="route-leg horizontal top"></i>
+      <i class="route-leg vertical"></i>
+      <i class="route-leg horizontal bottom"></i>
+      <i class="route-arrow-head down"></i>
+      <i class="route-arrow-head left"></i>
+    </span>
+
+    <span class="route-dash route-turn left-turn">
+      <i class="route-leg vertical"></i>
+      <i class="route-leg horizontal bottom"></i>
+      <i class="route-arrow-head down"></i>
+      <i class="route-arrow-head right"></i>
+    </span>
+  `;
+  boardEl.append(guide);
+}
+
 function emptyRoute() {
   // Null means this route slot is still face down. Open cards keep their exact slot.
   return Array.from({length: pathSlots.length}, () => null);
@@ -380,16 +435,23 @@ function revealedCards() {
   return state.revealed.filter(Boolean);
 }
 
+function unclaimedRouteTreasure() {
+  return revealedCards().reduce((total, card) => (
+    total + (card.type === "treasure" ? (card.leftover || 0) : 0)
+  ), 0);
+}
+
 function createCardElement(card) {
   // Cards are built in one place so the board and reveal animation always match.
   const el = document.createElement("div");
   el.className = `card ${card.type}`;
   if (card.type === "treasure") {
+    const showMainGems = !card.collected;
     el.innerHTML = `
       <div class="card-type">TREASURE</div>
-      ${createGemCluster(card.value, "card-gem-cluster")}
+      ${showMainGems ? createGemCluster(card.value, "card-gem-cluster") : ""}
       <div class="card-value">${card.value}</div>
-      ${createLeftoverGems(card.leftover || 0)}
+      ${card.collected ? createLeftoverGems(card.leftover || 0) : ""}
     `;
   } else if (card.type === "danger") {
     el.innerHTML = `
@@ -562,7 +624,7 @@ function resolveRevealedCard(card, newReveal = true) {
   renderBoard();
   if (!newReveal) {
     if (card.type === "treasure") {
-      distributeTreasure(card, {accumulateLeftover: true});
+      distributeTreasure(card);
       renderBoard();
     } else if (card.type === "danger") {
       turnText.textContent = `DANGER AGAIN: ${card.name}`;
@@ -651,14 +713,11 @@ function createFlyingGems(value) {
   });
 }
 
-function distributeTreasure(card, {accumulateLeftover = false} = {}) {
-  // The pure API is called here, then the updated leftover value is copied back to the card.
-  const previousLeftover = card.leftover || 0;
+function distributeTreasure(card) {
+  // The pure API is called here, then the updated route-pool value is copied back to the card.
   const result = applyTreasureDistribution(state.players, card);
   state.players = result.players;
-  Object.assign(card, result.card, {
-    leftover: (accumulateLeftover ? previousLeftover : 0) + (result.card.leftover || 0)
-  });
+  Object.assign(card, result.card);
   renderInventory();
 }
 
@@ -740,7 +799,9 @@ function choose(action) {
   state.playerChoice = action;
   continueButton.disabled = true;
   leaveButton.disabled = true;
-  decisionCopy.textContent = "Choice locked. Waiting for reveal.";
+  decisionCopy.textContent = "Choice locked.";
+  clearTimer();
+  window.setTimeout(resolveChoices, 180);
 }
 
 function continueLocalChoiceFlow() {
@@ -859,9 +920,9 @@ function startLocalChoiceTimer() {
 
 function botChoice(player) {
   // The bot only sees public information: danger already revealed, relic on board,
-  // current round and its own carried loot.
+  // current round and treasure still sitting on the route.
   const artifactOnBoard = revealedCards().some(card => card.type === "artifact" && !card.claimed);
-  return chooseBotAction(player, {
+  return chooseBotAction({...player, roundLoot: unclaimedRouteTreasure()}, {
     dangerCounts: state.dangerCounts,
     artifactOnBoard,
     round: state.round
@@ -959,12 +1020,6 @@ function showChoicesRevealPrompt() {
 
 function settleLeavingPlayers(leaving) {
   // Leaving players are resolved by the module, including leftover gems and relics.
-  const beforeById = Object.fromEntries(state.players.map(player => [
-    player.id,
-    {
-      tent: player.tent
-    }
-  ]));
   const result = settleReturningPlayers(
     state.players,
     revealedCards(),
@@ -986,11 +1041,11 @@ function settleLeavingPlayers(leaving) {
   renderInventory();
   return leaving.map(player => {
     const updated = state.players.find(candidate => candidate.id === player.id);
-    const before = beforeById[player.id] || {tent: 0, total: 0};
+    const roundStart = state.roundStartTent[player.id] || 0;
     return {
       id: player.id,
       name: updated?.name || player.name,
-      roundGain: Math.max(0, (updated?.tent || 0) - before.tent)
+      roundGain: (updated?.tent || 0) - roundStart
     };
   });
 }
@@ -1001,11 +1056,12 @@ function showReturnSummaries(summaries, onComplete) {
     onComplete?.();
     return;
   }
+  const summaryClass = returned.length === 1 ? "return-summary single" : "return-summary";
   showResult(
     "SAFE RETURN",
     "These explorers returned to the tent this round.",
     `
-      <div class="return-summary">
+      <div class="${summaryClass}">
         ${returned.map(summary => `
           <span><small>${summary.name}</small><strong>+${summary.roundGain}</strong></span>
         `).join("")}
@@ -1038,7 +1094,29 @@ function failRound(dangerName) {
     `<div class="danger-impact-text">THE CAVE STRIKES BACK</div>`,
     state.round === 5 ? "REVEAL FINAL WEALTH" : "NEXT ROUND",
     finishRound,
-    {variant: "danger-result"}
+    {variant: "danger-result", soundEffect: "death"}
+  );
+}
+
+function showOutPlayers(players, onComplete) {
+  showResult(
+    "BROKE EXPLORER CLUB",
+    "No deposit, no cave. The temple cashier has spoken.",
+    `
+      <img class="out-meme" src="assets/out-meme.png" alt="Out sticker">
+      <div class="out-joke">Wallet status: aggressively empty.</div>
+      <div class="return-summary out-summary">
+        ${players.map(player => `
+          <span><small>${player.name}</small><strong>OUT</strong><em>sent to tent jail</em></span>
+        `).join("")}
+      </div>
+    `,
+    "CONTINUE",
+    () => {
+      hideResult();
+      onComplete?.();
+    },
+    {variant: "out-result", soundEffect: "out"}
   );
 }
 
@@ -1128,7 +1206,9 @@ function ensureCurrentTurnActive() {
 
 function showResult(title, message, details, buttonText, action, options = {}) {
   // One overlay is reused for round starts, pass-device messages and end-round results.
-  overlay.classList.remove("danger-result");
+  const nextSoundEffect = options.soundEffect || null;
+  if (!nextSoundEffect || state.resultSoundEffect !== nextSoundEffect) stopSoundEffect();
+  overlay.classList.remove("danger-result", "out-result");
   if (options.variant) overlay.classList.add(options.variant);
   overlayTitle.textContent = title;
   overlayMessage.textContent = message;
@@ -1137,12 +1217,16 @@ function showResult(title, message, details, buttonText, action, options = {}) {
   overlayMenuButton.classList.toggle("hidden", !options.showMenuButton);
   state.pendingAction = action;
   overlay.classList.remove("hidden");
+  state.resultSoundEffect = nextSoundEffect;
+  if (state.resultSoundEffect) playSoundEffect(state.resultSoundEffect);
 }
 
 function hideResult() {
   overlay.classList.add("hidden");
-  overlay.classList.remove("danger-result");
+  overlay.classList.remove("danger-result", "out-result");
   overlayMenuButton.classList.add("hidden");
+  if (state.resultSoundEffect) stopSoundEffect();
+  state.resultSoundEffect = null;
 }
 
 function clearTimer() {
@@ -1223,6 +1307,38 @@ function stopBackgroundSound() {
 
 function updateBackgroundVolume() {
   if (state.audioElement) state.audioElement.volume = (state.volume / 100) * 0.45;
+}
+
+function playSoundEffect(name) {
+  if (!state.soundOn) return;
+  const track = sfxTracks[name];
+  if (!track) return;
+  if (state.sfxElement?.dataset.effect === name && !state.sfxElement.ended) return;
+  state.sfxElement?.pause();
+  const audio = new Audio(track);
+  audio.preload = "auto";
+  audio.loop = false;
+  audio.dataset.effect = name;
+  audio.volume = Math.min(1, (state.volume / 100) * 0.9);
+  audio.addEventListener("ended", () => {
+    if (state.sfxElement === audio) state.sfxElement = null;
+  }, {once: true});
+  state.sfxElement = audio;
+  audio.play().catch(() => {});
+}
+
+function stopSoundEffect() {
+  state.sfxElement?.pause();
+  if (state.sfxElement) state.sfxElement.currentTime = 0;
+  state.sfxElement = null;
+}
+
+function preloadSoundEffects() {
+  Object.values(sfxTracks).forEach(track => {
+    const audio = new Audio(track);
+    audio.preload = "auto";
+    audio.load();
+  });
 }
 
 function pauseGame() {
@@ -1342,6 +1458,7 @@ syncTutorialDots();
 buildSettingsRules();
 buildCharacterSelectors();
 updatePlayerNameFields();
+preloadSoundEffects();
 setSound(true);
 
 function buildCharacterSelectors() {

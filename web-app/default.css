@@ -1258,6 +1258,27 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   opacity: .82;
 }
 
+.player-panel.dropped {
+  filter: saturate(.55) contrast(.92);
+}
+
+.player-panel .out-stamp {
+  position: absolute;
+  z-index: 8;
+  right: 6%;
+  bottom: 7%;
+  padding: 5px 16px;
+  border: 4px solid #8e1d16;
+  border-radius: 5px;
+  color: #8e1d16;
+  background: rgba(255, 246, 224, .82);
+  box-shadow: 0 3px 0 rgba(64, 35, 22, .25);
+  font: 1000 clamp(16px, 1.4vw, 30px) Impact, "Arial Black", sans-serif;
+  letter-spacing: .08em;
+  transform: rotate(-9deg);
+  text-transform: uppercase;
+}
+
 .board-wrap {
   position: absolute;
   z-index: 1;
@@ -4136,6 +4157,11 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   margin: 18px 0 4px;
 }
 
+.return-summary.single {
+  grid-template-columns: minmax(220px, 320px);
+  justify-content: center;
+}
+
 .return-summary span {
   display: grid;
   gap: 6px;
@@ -4634,6 +4660,186 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   80% { transform: translate(2px, 1px); }
 }
 
+.board-slot.route-guide::after {
+  content: "";
+  position: absolute;
+  z-index: 8;
+  display: grid;
+  width: clamp(38px, 2.8vw, 62px);
+  height: clamp(30px, 2.1vw, 48px);
+  place-items: center;
+  border: 4px solid #4b311d;
+  border-radius: 999px;
+  color: #4b250d;
+  background: linear-gradient(#fff1a8, #f2b737);
+  content: "→";
+  filter:
+    drop-shadow(0 4px 0 rgba(62, 38, 19, .42))
+    drop-shadow(0 0 10px rgba(255, 232, 106, .92));
+  font: 1000 clamp(22px, 1.9vw, 40px) Arial, sans-serif;
+  line-height: 1;
+  pointer-events: none;
+  animation: route-guide-pulse .72s ease-in-out infinite alternate;
+}
+
+.board-slot.route-guide[data-guide="down"]::after {
+  content: "↓";
+  left: 50%;
+  bottom: -20%;
+  transform: translateX(-50%);
+}
+
+.board-slot.route-guide[data-guide="left"]::after {
+  content: "←";
+  left: -20%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.board-slot.route-guide[data-guide="right"]::after {
+  content: "→";
+  right: -20%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.board-slot.route-guide[data-guide="right-down"]::after {
+  content: "→↓";
+  right: -19%;
+  bottom: -18%;
+  width: clamp(48px, 3.6vw, 78px);
+}
+
+.board-slot.route-guide[data-guide="left-down"]::after {
+  content: "←↓";
+  left: -19%;
+  bottom: -18%;
+  width: clamp(48px, 3.6vw, 78px);
+}
+
+@keyframes route-guide-pulse {
+  from { opacity: .72; }
+  to { opacity: 1; }
+}
+
+/* Stronger S-route guidance: every path slot gets a subtle direction ribbon. */
+.board-slot.path {
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 242, 173, .26),
+    0 0 0 1px rgba(255, 229, 111, .28);
+}
+
+.board-slot.path::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 40% -10%;
+  border-block: 5px solid rgba(255, 245, 146, .92);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 244, 141, .98) 0 22px,
+      transparent 22px 35px
+    );
+  box-shadow:
+    0 0 15px rgba(255, 220, 82, .55),
+    inset 0 0 0 2px rgba(87, 51, 23, .18);
+  opacity: .92;
+  pointer-events: none;
+}
+
+.board-slot.path:nth-child(n + 8):nth-child(-n + 14)::before {
+  background:
+    repeating-linear-gradient(
+      270deg,
+      rgba(255, 244, 141, .98) 0 22px,
+      transparent 22px 35px
+    );
+}
+
+.board-slot.path:nth-child(7)::before,
+.board-slot.path:nth-child(8)::before,
+.board-slot.path:nth-child(14)::before,
+.board-slot.path:nth-child(15)::before {
+  inset: -12% 39%;
+  border-block: 0;
+  border-inline: 5px solid rgba(255, 245, 146, .92);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 244, 141, .98) 0 22px,
+      transparent 22px 35px
+    );
+}
+
+.reveal-label {
+  display: none !important;
+}
+
+#message-overlay.out-result .result-card {
+  border-color: #263648;
+  overflow: visible;
+  color: #edf7ff;
+  background:
+    radial-gradient(circle at 50% 0, rgba(255, 220, 96, .28), transparent 28%),
+    linear-gradient(180deg, #28556f, #17283a 100%);
+  box-shadow:
+    0 0 38px rgba(95, 174, 223, .52),
+    8px 10px 0 rgba(13, 20, 28, .38);
+  animation: danger-card-slam .72s cubic-bezier(.18, 1.3, .2, 1) both;
+}
+
+#message-overlay.out-result h2 {
+  color: #cceeff;
+  text-shadow: 0 3px 0 #12202d, 0 0 16px rgba(132, 206, 255, .76);
+}
+
+#message-overlay.out-result p {
+  color: #eff8ff;
+  font-weight: 900;
+}
+
+.out-summary span {
+  border-color: #20394d;
+  background: linear-gradient(#e5f7ff, #8cc2e1);
+}
+
+.out-summary strong {
+  color: #17334b;
+  font-size: clamp(26px, 2.4vw, 42px);
+}
+
+.out-summary em {
+  color: #32647f;
+  font: 900 11px Arial, sans-serif;
+  font-style: normal;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.out-meme {
+  display: block;
+  width: clamp(95px, 9vw, 150px);
+  margin: -22px auto 8px;
+  border: 4px solid #fff4c5;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 5px 0 rgba(14, 20, 27, .32);
+  transform: rotate(-5deg);
+}
+
+.out-joke {
+  width: fit-content;
+  max-width: 100%;
+  margin: 6px auto 14px;
+  padding: 8px 14px;
+  border: 3px dashed #ffe37d;
+  border-radius: 999px;
+  color: #ffeaa2;
+  background: rgba(19, 32, 45, .62);
+  font: 1000 clamp(14px, 1.1vw, 20px) Arial, sans-serif;
+}
+
 /* Home rules keep the original screenshot-and-copy layout, using placeholder PNGs for now. */
 #rules-screen .tutorial-slide {
   display: grid;
@@ -4695,4 +4901,387 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 #rules-screen .tutorial-slide dt,
 #rules-screen .tutorial-slide dd {
   font-size: clamp(12px, .88vw, 16px);
+}
+
+/* Final route-guide rollback: keep only clean glowing corner arrows. */
+.board-slot.path::before {
+  display: none !important;
+}
+
+.board-slot.route-guide::after {
+  content: "" !important;
+  position: absolute;
+  z-index: 12;
+  display: block;
+  width: clamp(34px, 2.45vw, 54px);
+  height: clamp(34px, 2.45vw, 54px);
+  border: 0;
+  border-right: 10px solid #ffd12d;
+  border-bottom: 10px solid #ffd12d;
+  border-radius: 0;
+  background: transparent;
+  filter:
+    drop-shadow(0 4px 0 rgba(54, 30, 13, .7))
+    drop-shadow(0 0 12px rgba(255, 181, 28, .95));
+  pointer-events: none;
+  animation: route-guide-pulse .72s ease-in-out infinite alternate;
+}
+
+.board-slot.route-guide[data-guide="down"]::after {
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: -34%;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.board-slot.route-guide[data-guide="left"]::after {
+  left: -39%;
+  right: auto;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%) rotate(135deg);
+}
+
+.board-slot.route-guide[data-guide="right"]::after {
+  left: auto;
+  right: -39%;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+/* Route arrows are positioned in the gaps between cards, not on the cards. */
+.board {
+  position: relative;
+  overflow: visible;
+}
+
+.board-slot.route-guide::after {
+  display: none !important;
+}
+
+.route-arrow {
+  display: none !important;
+}
+
+.route-arrow-right {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.route-arrow-left {
+  transform: translate(-50%, -50%) rotate(135deg);
+}
+
+.route-arrow-down {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* S-route guide: black dashed path outside the card faces. */
+.board::before,
+.board::after {
+  content: none !important;
+}
+
+.board::before {
+  left: -5.2%;
+  top: 13.8%;
+  width: 110.4%;
+  height: 72.4%;
+  background:
+    linear-gradient(90deg, #2a2117 60%, transparent 0) 0 0 / 18px 4px repeat-x,
+    linear-gradient(#2a2117 60%, transparent 0) 100% 0 / 4px 18px repeat-y,
+    linear-gradient(90deg, #2a2117 60%, transparent 0) 0 50% / 18px 4px repeat-x,
+    linear-gradient(#2a2117 60%, transparent 0) 0 50% / 4px 18px repeat-y,
+    linear-gradient(90deg, #2a2117 60%, transparent 0) 0 100% / 18px 4px repeat-x;
+  background-repeat: repeat-x, repeat-y, repeat-x, repeat-y, repeat-x;
+  opacity: .82;
+}
+
+.board::after {
+  left: -8.4%;
+  top: 12.1%;
+  width: 118%;
+  height: 76%;
+  background:
+    linear-gradient(135deg, transparent 50%, #2a2117 51%) 0 0 / 24px 24px no-repeat,
+    linear-gradient(45deg, #2a2117 49%, transparent 50%) 0 0 / 24px 24px no-repeat,
+    linear-gradient(225deg, transparent 50%, #2a2117 51%) 100% 50% / 24px 24px no-repeat,
+    linear-gradient(315deg, #2a2117 49%, transparent 50%) 100% 50% / 24px 24px no-repeat,
+    linear-gradient(135deg, transparent 50%, #2a2117 51%) 0 100% / 24px 24px no-repeat,
+    linear-gradient(45deg, #2a2117 49%, transparent 50%) 0 100% / 24px 24px no-repeat;
+  opacity: .82;
+}
+
+.route-guide-path {
+  position: absolute;
+  z-index: 22;
+  inset: 0;
+  pointer-events: none;
+}
+
+.route-dash,
+.route-leg {
+  position: absolute;
+  display: block;
+}
+
+.route-entry.top-entry {
+  left: -3.4%;
+  top: 16.35%;
+  width: 3.4%;
+  border-top: 3px dashed rgba(18, 15, 11, .86);
+}
+
+.route-entry.top-entry::after,
+.route-arrow-head {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.route-entry.top-entry::after,
+.route-arrow-head.right {
+  right: -9px;
+  top: -8px;
+  border-block: 10px solid transparent;
+  border-left: 15px solid rgba(18, 15, 11, .86);
+}
+
+.route-arrow-head.left {
+  left: -9px;
+  bottom: -9px;
+  border-block: 10px solid transparent;
+  border-right: 15px solid rgba(18, 15, 11, .86);
+}
+
+.right-turn {
+  left: 98.7%;
+  top: 16.35%;
+  width: 4.2%;
+  height: 33.3%;
+}
+
+.right-turn .horizontal {
+  left: 0;
+  top: 0;
+  width: 100%;
+  border-top: 3px dashed rgba(18, 15, 11, .86);
+}
+
+.right-turn .vertical {
+  right: 0;
+  top: 0;
+  height: 100%;
+  border-right: 3px dashed rgba(18, 15, 11, .86);
+}
+
+.middle-row-link {
+  top: 49.65%;
+  width: 3.15%;
+  border-top: 3px dashed rgba(18, 15, 11, .86);
+}
+
+.middle-row-link.link-6-5 {
+  left: 83.3%;
+}
+
+.middle-row-link.link-5-4 {
+  left: 68.95%;
+}
+
+.middle-row-link.link-4-3 {
+  left: 54.6%;
+}
+
+.middle-row-link.link-3-2 {
+  left: 40.3%;
+}
+
+.middle-row-link.link-2-1 {
+  left: 25.95%;
+}
+
+.middle-row-link.link-1-out {
+  left: 11.65%;
+}
+
+.left-turn {
+  left: -2.7%;
+  top: 49.65%;
+  width: 2.7%;
+  height: 33.15%;
+}
+
+.left-turn .vertical {
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-left: 3px dashed rgba(18, 15, 11, .86);
+}
+
+.left-turn .horizontal {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-bottom: 3px dashed rgba(18, 15, 11, .86);
+}
+
+.left-turn .route-arrow-head.right {
+  top: auto;
+  bottom: -10px;
+}
+
+/* 精简路线修复：只补左右拐角横线，不压卡牌 */
+.board {
+  position: relative;
+  overflow: visible;
+}
+
+.route-guide-path {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.route-dash,
+.route-leg,
+.route-arrow-head {
+  position: absolute;
+  display: block;
+}
+
+.middle-row-link {
+  display: none !important;
+}
+
+/* START 左侧入口：向右 */
+.route-entry.top-entry {
+  left: -3.2%;
+  top: 16.5%;
+  width: 3.2%;
+  border-top: 3px dashed #111;
+}
+
+.route-entry.top-entry::after {
+  content: "";
+  position: absolute;
+  right: -11px;
+  top: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 13px solid #111;
+}
+
+/* 右侧：第一排出来 -> 向下 -> 第二排向左 */
+.right-turn {
+  left: 99%;
+  top: 16.5%;
+  width: 4.2%;
+  height: 33%;
+}
+
+.right-turn .horizontal {
+  left: 0;
+  top: 0;
+  width: 100%;
+  border-top: 3px dashed #111;
+}
+
+.right-turn .vertical {
+  right: 0;
+  top: 0;
+  height: 100%;
+  border-right: 3px dashed #111;
+}
+
+.right-turn::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-top: 3px dashed #111;
+}
+
+.right-turn .route-arrow-head.left {
+  left: -10px;
+  bottom: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 13px solid #111;
+}
+
+/* 左侧：第二排出来 -> 向下 -> 第三排向右 */
+.left-turn {
+  left: -3.2%;
+  top: 49.8%;
+  width: 3.2%;
+  height: 33%;
+}
+
+.left-turn::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  border-top: 3px dashed #111;
+}
+
+.left-turn .vertical {
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-left: 3px dashed #111;
+}
+
+.left-turn .horizontal {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-top: 3px dashed #111;
+}
+
+.left-turn .route-arrow-head.right {
+  right: -10px;
+  bottom: -8px;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 13px solid #111;
+}
+/* 背包说明弹窗置顶：防止被 CURRENT ROUND 或卡牌盖住 */
+.player-inventory {
+  z-index: 3;
+  overflow: visible !important;
+}
+
+.player-inventory:has(.pack-help:hover),
+.player-inventory:has(.pack-help:focus-within),
+.player-inventory:has(.pack-help[open]) {
+  z-index: 80;
+}
+
+.player-inventory .inventory-title {
+  position: relative;
+  z-index: 20;
+  overflow: visible;
+}
+
+.player-inventory .inventory-row,
+.player-inventory .inventory-current,
+.player-inventory .inventory-private {
+  position: relative;
+  z-index: 1;
+}
+
+.pack-help {
+  position: absolute;
+  z-index: 12;
+}
+
+.pack-help div {
+  z-index: 9999 !important;
 }

@@ -33,6 +33,7 @@
  * @property {number} [value] Treasure or relic point value.
  * @property {number} [number] Printed relic number.
  * @property {number} [leftover] Treasure remaining on the route.
+ * @property {boolean} [collected] Whether treasure has been taken from this card.
  * @property {string} [name] Danger name.
  * @property {boolean} [claimed] Whether a relic has been claimed.
  */
@@ -143,7 +144,7 @@ export const createRoundDeck = function ({
 }) {
     // The values are varied so each reveal creates a different split problem.
     const treasures = TREASURE_VALUES.map(function (value) {
-        return {type: "treasure", value, leftover: 0};
+        return {type: "treasure", value, leftover: 0, collected: false};
     });
     // dangerPool is passed in because duplicate danger cards are removed after
     // a failed round, so later rounds may not have all 15 danger cards.
@@ -170,26 +171,30 @@ export const createRoundDeck = function ({
 };
 
 /**
- * Pay the deposit from the wallet and reset explorer state for a new round.
+ * Pay the deposit from the wallet and tent score, then reset explorer state.
  *
  * @param {Explorer[]} players Current explorers.
+ * @param {Object} [options] Round setup.
+ * @param {number} [options.round=1] Current round number.
  * @returns {Explorer[]} New explorer records ready for the round.
  */
-export const preparePlayersForRound = function (players) {
+export const preparePlayersForRound = function (players, {round = 1} = {}) {
     return players.map(function (player) {
-        if (player.dropped) {
+        if (player.dropped || (round >= 5 && player.tent <= 0)) {
             // A dropped player left the whole match, so later rounds skip them.
             return {
                 ...cloneExplorer(player),
                 roundLoot: 0,
                 active: false,
+                dropped: player.dropped || round >= 5,
                 choice: null
             };
         }
         return {
             ...cloneExplorer(player),
-            // The deposit is paid from the starting wallet. It is recovered
-            // only if the explorer gets back to camp safely.
+            // The deposit is paid up front and immediately reflected in the
+            // safe score. A safe return adds it back; danger leaves it lost.
+            tent: player.tent - 1,
             wallet: player.wallet - 1,
             roundLoot: 0,
             active: true,
@@ -199,35 +204,46 @@ export const preparePlayersForRound = function (players) {
 };
 
 /**
- * Divide a treasure card equally between active explorers.
+ * Add a treasure card's value to the unclaimed route pool.
  *
  * @param {Explorer[]} players Current explorers.
  * @param {GameCard} card Revealed treasure card.
  * @returns {{players: Explorer[], card: GameCard, share: number}} Distribution.
  */
 export const distributeTreasure = function (players, card) {
-    const activeCount = players.filter(function (player) {
-        return player.active;
-    }).length;
     // Non-treasure cards pass through unchanged. This keeps the caller simple.
-    if (card.type !== "treasure" || activeCount === 0) {
+    if (card.type !== "treasure") {
         return {
             players: players.map(cloneExplorer),
             card: {...card},
             share: 0
         };
     }
-    // Treasure is divided only between explorers still in the cave. Any
-    // remainder stays on the route and can be picked up later by returners.
-    const share = Math.floor(card.value / activeCount);
+    // Treasure is not awarded immediately. It stays on the route until one or
+    // more explorers return to the tent.
     return {
-        players: players.map(function (player) {
-            return player.active
-                ? {...cloneExplorer(player), roundLoot: player.roundLoot + share}
-                : cloneExplorer(player);
-        }),
-        card: {...card, leftover: card.value % activeCount},
-        share
+        players: players.map(cloneExplorer),
+        card: {
+            ...card,
+            leftover: (card.leftover || 0) + card.value,
+            collected: false
+        },
+        share: 0
+    };
+};
+
+const removeClaimedTreasure = function (card, amount) {
+    if (card.type !== "treasure" || amount <= 0) {
+        return {card: {...card}, remaining: amount};
+    }
+    const taken = Math.min(card.leftover || 0, amount);
+    return {
+        card: {
+            ...card,
+            leftover: (card.leftover || 0) - taken,
+            collected: true
+        },
+        remaining: amount - taken
     };
 };
 
@@ -273,7 +289,7 @@ export const settleReturningPlayers = function (
         }
         return {
             ...cloneExplorer(player),
-            tent: player.tent + player.roundLoot + share + (
+            tent: player.tent + player.roundLoot + share + 1 + (
                 claimRelics
                     ? relicPoints
                     : 0
@@ -290,10 +306,12 @@ export const settleReturningPlayers = function (
                 })
         };
     });
+    let claimedTreasure = share * leaving.size;
     const updatedRoute = revealed.map(function (card) {
         if (card.type === "treasure" && leaving.size > 0) {
-            // Whatever cannot be split still stays printed on the route card.
-            return {...card, leftover: card.leftover % leaving.size};
+            const result = removeClaimedTreasure(card, claimedTreasure);
+            claimedTreasure = result.remaining;
+            return result.card;
         }
         if (claimRelics && card.type === "artifact" && !card.claimed) {
             return {...card, claimed: true};
@@ -315,11 +333,10 @@ export const failRound = function (players, dangerPool, dangerName) {
     return {
         players: players.map(function (player) {
             // Safe players keep their tent wealth. Explorers still inside lose
-            // what they are carrying and the one-point deposit for this round.
+            // what they are carrying; the deposit was already paid up front.
             return player.active
                 ? {
                     ...cloneExplorer(player),
-                    tent: player.tent - 1,
                     roundLoot: 0,
                     active: false
                 }
