@@ -6,10 +6,33 @@ import {
     failRound,
     preparePlayersForRound,
     rankPlayers,
-    settleReturningPlayers
+    settleReturningPlayers,
+    shuffle
 } from "../TempleTreasure.js";
 
+const fullDangerPool = function () {
+    return {
+        FIRE: 3,
+        LANDSLIDE: 3,
+        SNAKES: 3,
+        SPIDERS: 3,
+        MUMMY: 3
+    };
+};
+
 describe("Temple Treasure game module", function () {
+    describe("utility API", function () {
+        it("shuffles a copy without changing the original list", function () {
+            const source = [1, 2, 3, 4];
+            // Fixed randomness keeps this test about API behaviour, not luck.
+            const shuffled = shuffle(source, function () {
+                return 0;
+            });
+            assert.deepEqual(source, [1, 2, 3, 4]);
+            assert.deepEqual(shuffled, [2, 3, 4, 1]);
+        });
+    });
+
     describe("round setup", function () {
         it("charges every explorer one deposit and resets round state", function () {
             const players = createPlayers();
@@ -44,13 +67,7 @@ describe("Temple Treasure game module", function () {
 
         it("builds 15 treasure, 15 danger and one numbered relic", function () {
             const deck = createRoundDeck({
-                dangerPool: {
-                    FIRE: 3,
-                    LANDSLIDE: 3,
-                    SNAKES: 3,
-                    SPIDERS: 3,
-                    MUMMY: 3
-                },
+                dangerPool: fullDangerPool(),
                 artifactNumber: 4,
                 random: function () {
                     return 0;
@@ -109,6 +126,7 @@ describe("Temple Treasure game module", function () {
             const players = createPlayers();
             players[0] = {...players[0], tent: 3, wallet: 3};
             players[0].roundLoot = 8;
+            // Safe return refunds the entry deposit; it is not extra treasure.
             const result = settleReturningPlayers(
                 players,
                 [{type: "treasure", value: 7, leftover: 3}],
@@ -148,6 +166,7 @@ describe("Temple Treasure game module", function () {
             const players = createPlayers();
             players[0] = {...players[0], tent: 3, wallet: 3};
             players[1] = {...players[1], tent: 3, wallet: 3};
+            // Two players sharing 11 leaves the visible one-gem remainder.
             const result = settleReturningPlayers(
                 players,
                 [
@@ -168,10 +187,11 @@ describe("Temple Treasure game module", function () {
     });
 
     describe("danger and ranking", function () {
-        it("removes carried loot, loses the deposit and removes that danger type", function () {
+        it("removes carried loot, loses the deposit and removes only the first two danger types", function () {
             const players = createPlayers();
             players[0].tent = 3;
             players[0].roundLoot = 12;
+            // Only the first two duplicate danger failures retire card types.
             const result = failRound(
                 players,
                 {FIRE: 3},
@@ -181,6 +201,16 @@ describe("Temple Treasure game module", function () {
             assert.equal(result.players[0].roundLoot, 0);
             assert.equal(result.players[0].active, false);
             assert.equal(result.dangerPool.FIRE, 0);
+            assert.deepEqual(result.removedDangerTypes, ["FIRE"]);
+
+            const laterResult = failRound(
+                players,
+                {FIRE: 0, SNAKES: 3, MUMMY: 3},
+                "MUMMY",
+                {removedDangerTypes: ["FIRE", "SNAKES"]}
+            );
+            assert.equal(laterResult.dangerPool.MUMMY, 3);
+            assert.deepEqual(laterResult.removedDangerTypes, ["FIRE", "SNAKES"]);
         });
 
         it("ranks by final score and then by relic count", function () {

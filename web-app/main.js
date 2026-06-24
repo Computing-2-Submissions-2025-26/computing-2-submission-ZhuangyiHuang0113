@@ -108,9 +108,11 @@ const state = {
   round: 1,
   phase: "menu",
   deck: [],
+  hiddenRouteCards: [],
   revealed: [],
   dangerCounts: {},
   dangerPool: {},
+  removedDangerTypes: [],
   artifactPool: [...ARTIFACT_NUMBERS],
   players: [],
   timer: null,
@@ -154,8 +156,18 @@ function buildDeck() {
     : null;
   return createRoundDeck({
     dangerPool: state.dangerPool,
-    artifactNumber
+    artifactNumber,
+    random: randomUnit
   });
+}
+
+function randomUnit() {
+  if (globalThis.crypto?.getRandomValues) {
+    const values = new Uint32Array(1);
+    globalThis.crypto.getRandomValues(values);
+    return values[0] / 2 ** 32;
+  }
+  return Math.random();
 }
 
 function createPlayers() {
@@ -183,6 +195,7 @@ function startGame(mode = state.gameMode) {
   state.round = 1;
   state.artifactPool = [...ARTIFACT_NUMBERS];
   state.dangerPool = Object.fromEntries(DANGER_NAMES.map(name => [name, 3]));
+  state.removedDangerTypes = [];
   state.players = createPlayers();
   state.roundStartPlayer = 0;
   state.lastRoll = null;
@@ -194,7 +207,9 @@ function startRound() {
   // A round starts by building a fresh deck and charging each explorer's deposit.
   state.phase = "round-start";
   state.localChoicePromptOpen = false;
-  state.deck = buildDeck();
+  const shuffledDeck = buildDeck();
+  state.hiddenRouteCards = shuffledDeck.slice(0, pathSlots.length);
+  state.deck = shuffledDeck.slice(pathSlots.length);
 
   // The route is stored as fixed slots, not as a simple growing list. That makes
   // the dice mechanic possible: landing on slot 6 always means the same board
@@ -217,7 +232,7 @@ function startRound() {
   renderAll();
   if (eliminated.length) {
     showOutPlayers(eliminated, () => {
-      if (!activeExplorers().length) {
+      if (remainingContenders().length <= 1 || !activeExplorers().length) {
         showFinalRanking();
         return;
       }
@@ -555,7 +570,7 @@ function rollDiceAndReveal() {
   updatePauseButton();
   diceButton.disabled = true;
   diceButton.classList.add("rolling");
-  state.lastRoll = 1 + Math.floor(Math.random() * 6);
+  state.lastRoll = 1 + Math.floor(randomUnit() * 6);
 
   // CSS reads data-roll and turns the dice cube to the correct final face.
   diceButton.dataset.roll = String(state.lastRoll);
@@ -607,11 +622,11 @@ function revealLandedCard() {
   // Revisited cards are shown again only. Hidden cards are the only ones that
   // change score, relics or danger counts.
   if (newReveal) {
-    if (!state.deck.length) {
+    if (!state.hiddenRouteCards[state.routePosition]) {
       endRoundSafely("No hidden cards remain in the cave.");
       return;
     }
-    card = state.deck.pop();
+    card = state.hiddenRouteCards[state.routePosition];
     state.revealed[state.routePosition] = card;
   }
   renderBoard();
@@ -670,6 +685,21 @@ function showFeaturedCard(card, onComplete) {
   // The big centre card is only presentation; the actual card is already in state.
   // Treasure cards also show small gems flying into the card so the value is
   // readable before the card shrinks back to the board.
+  let finished = false;
+  const timers = [];
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    timers.forEach(timer => window.clearTimeout(timer));
+    window.removeEventListener("pointerdown", finish, true);
+    window.removeEventListener("click", finish, true);
+    cardRevealStage.classList.add("hidden");
+    cardRevealStage.classList.remove("flying");
+    featuredCard.replaceChildren();
+    flyingGems.replaceChildren();
+    onComplete();
+  };
+
   featuredCard.replaceChildren(createCardElement(card));
   flyingGems.replaceChildren();
   if (card.type === "treasure") createFlyingGems(card.value);
@@ -680,8 +710,11 @@ function showFeaturedCard(card, onComplete) {
       : `RELIC ${card.number} - ${card.value} POINTS`;
   cardRevealStage.classList.remove("hidden", "flying");
   featuredCard.getAnimations().forEach(animation => animation.cancel());
+  window.addEventListener("pointerdown", finish, true);
+  window.addEventListener("click", finish, true);
 
-  window.setTimeout(() => {
+  timers.push(window.setTimeout(() => {
+    if (finished) return;
     cardRevealStage.classList.add("flying");
     featuredCard.animate(
       [
@@ -690,15 +723,9 @@ function showFeaturedCard(card, onComplete) {
       ],
       { duration: 520, easing: "cubic-bezier(.4,0,.8,.2)", fill: "forwards" }
     );
-  }, 4000);
+  }, 4000));
 
-  window.setTimeout(() => {
-    cardRevealStage.classList.add("hidden");
-    cardRevealStage.classList.remove("flying");
-    featuredCard.replaceChildren();
-    flyingGems.replaceChildren();
-    onComplete();
-  }, 4550);
+  timers.push(window.setTimeout(finish, 4550));
 }
 
 function createFlyingGems(value) {
@@ -760,6 +787,13 @@ function beginDecision() {
     state.localChoiceQueue = state.players.filter(player => player.active);
     state.localChoiceIndex = 0;
     promptLocalChoiceTurn();
+    return;
+  }
+  if (isSpectating) {
+    decisionCopy.textContent = "The remaining explorers are choosing.";
+    continueButton.classList.add("hidden");
+    leaveButton.classList.add("hidden");
+    window.setTimeout(resolveChoices, 180);
     return;
   }
   startBotChoiceTimer();
@@ -831,7 +865,7 @@ function quitCurrentLocalPlayer() {
   if (state.phase === "ready" || state.phase === "rolling") {
     diceButton.classList.add("hidden");
     state.phase = "ready";
-    if (!activeExplorers().length) {
+    if (remainingContenders().length <= 1 || !activeExplorers().length) {
       endRoundSafely("All remaining explorers left or returned.");
       return;
     }
@@ -843,7 +877,7 @@ function quitCurrentLocalPlayer() {
   if (state.phase === "decision") {
     state.localChoiceQueue = state.localChoiceQueue.filter(queued => !queued.dropped && queued.active);
     if (state.localChoiceIndex >= state.localChoiceQueue.length) {
-      if (!activeExplorers().length) {
+      if (remainingContenders().length <= 1 || !activeExplorers().length) {
         endRoundSafely("All remaining explorers left or returned.");
         return;
       }
@@ -867,6 +901,10 @@ function currentLocalPlayerForQuit() {
 
 function activeExplorers() {
   return state.players.filter(player => player.active && !player.dropped);
+}
+
+function remainingContenders() {
+  return state.players.filter(player => !player.dropped);
 }
 
 function promptLocalChoiceTurn() {
@@ -978,7 +1016,7 @@ async function resolveChoices() {
   }).join("");
   choiceRevealStage.classList.remove("hidden", "show-results");
   choiceRevealStage.classList.add("show-results");
-  await delay(2400);
+  await skippableStageDelay(choiceRevealStage, 2400);
   choiceRevealStage.classList.add("hidden");
   choiceRevealStage.classList.remove("show-results");
 
@@ -1001,6 +1039,24 @@ async function resolveChoices() {
 
 function delay(milliseconds) {
   return new Promise(resolve => window.setTimeout(resolve, milliseconds));
+}
+
+function skippableStageDelay(stage, milliseconds) {
+  return new Promise(resolve => {
+    let done = false;
+    let timer = null;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.clearTimeout(timer);
+      window.removeEventListener("pointerdown", finish, true);
+      window.removeEventListener("click", finish, true);
+      resolve();
+    };
+    window.addEventListener("pointerdown", finish, true);
+    window.addEventListener("click", finish, true);
+    timer = window.setTimeout(finish, milliseconds);
+  });
 }
 
 function showChoicesRevealPrompt() {
@@ -1082,10 +1138,12 @@ function failRound(dangerName) {
   const result = applyRoundFailure(
     state.players,
     state.dangerPool,
-    dangerName
+    dangerName,
+    {removedDangerTypes: state.removedDangerTypes}
   );
   state.players = result.players;
   state.dangerPool = result.dangerPool;
+  state.removedDangerTypes = result.removedDangerTypes;
   renderPlayers();
   renderInventory();
   showResult(
@@ -1139,6 +1197,10 @@ function finishRound() {
   // After round five, no more decks are made and the final ranking is shown.
   hideResult();
   if (state.round >= 5) {
+    showFinalRanking();
+    return;
+  }
+  if (remainingContenders().length <= 1) {
     showFinalRanking();
     return;
   }
@@ -1531,11 +1593,13 @@ function setupCaptureScene(scene) {
   state.localCharacters = ["scout", "torch", "map", "guard"];
   state.players = createPlayers();
   state.dangerPool = Object.fromEntries(DANGER_NAMES.map(name => [name, 3]));
+  state.removedDangerTypes = [];
   state.artifactPool = [...ARTIFACT_NUMBERS];
   state.round = scene === "final" ? 5 : 1;
   state.currentTurn = 0;
   state.phase = "ready";
   state.deck = [];
+  state.hiddenRouteCards = [];
   state.dangerCounts = {};
   state.revealed = captureRoute(scene);
   state.routePosition = lastOpenRoutePosition();

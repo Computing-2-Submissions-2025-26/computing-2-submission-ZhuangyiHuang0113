@@ -5285,3 +5285,15 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 .pack-help div {
   z-index: 9999 !important;
 }
+
+#game-screen .round-tabs {
+  left: 50%;
+  width: auto;
+  transform: translateX(-50%);
+  justify-content: center;
+}
+
+#card-reveal-stage,
+#choice-reveal-stage {
+  cursor: pointer;
+}

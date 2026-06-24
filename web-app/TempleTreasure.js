@@ -1,10 +1,9 @@
 /**
- * Pure game rules for Temple Treasure.
+ * Rules engine for Temple Treasure.
  *
- * This module is kept away from the DOM on purpose. The page can look different,
- * but these functions still describe the game itself. Every operation receives
- * data and returns new data, so a complete game can be simulated in a console
- * or a unit test.
+ * The browser layer handles artwork, timers and clicks. This file keeps the
+ * board-game decisions in plain data so the same rules can be tested without a
+ * page open.
  *
  * @module TempleTreasure
  */
@@ -42,16 +41,15 @@ export const TREASURE_VALUES = Object.freeze([
     1, 2, 3, 4, 5, 5, 7, 7, 9, 11, 11, 13, 14, 15, 17
 ]);
 
-// Names are kept readable because the UI prints them directly on danger cards.
+// These strings are printed on the danger cards.
 export const DANGER_NAMES = Object.freeze([
     "FIRE", "LANDSLIDE", "SNAKES", "SPIDERS", "MUMMY"
 ]);
 
-// One relic number is added each round. The number also decides its point value.
+// One relic enters each round; the number is also its score multiplier.
 export const ARTIFACT_NUMBERS = Object.freeze([1, 2, 3, 4, 5]);
 
-// Player ids stay fixed even when local multiplayer changes the display names.
-// That makes tests and DOM ids much simpler.
+// Stable ids let local players rename themselves without breaking saved state.
 const PLAYER_TEMPLATES = Object.freeze([
     {id: "you", name: "YOU", color: "red"},
     {id: "atu", name: "ATU", color: "blue"},
@@ -60,8 +58,7 @@ const PLAYER_TEMPLATES = Object.freeze([
 ]);
 
 const cloneExplorer = function (player) {
-    // Nested artifacts are cloned too, otherwise tests can accidentally share
-    // old object references between turns.
+    // Clone nested relics so a later round cannot mutate an earlier state.
     return {
         ...player,
         artifacts: player.artifacts.map(function (artifact) {
@@ -78,8 +75,8 @@ const cloneExplorer = function (player) {
  * @returns {Array<*>} Shuffled copy.
  */
 export const shuffle = function (items, random = Math.random) {
-    // Tests can pass a random function in when a predictable deck is needed.
     const result = [...items];
+    // Fisher-Yates keeps the API deterministic when tests pass fake randomness.
     let index = result.length - 1;
     while (index > 0) {
         const swapIndex = Math.floor(random() * (index + 1));
@@ -107,15 +104,13 @@ export const createPlayers = function ({
     names = []
 } = {}) {
     const playerCount = mode === "local" ? count : 4;
-    // Bot mode always fills all four tents. Local mode uses the selected count.
     return PLAYER_TEMPLATES.slice(0, playerCount).map(function (template, index) {
         return {
             ...template,
             name: mode === "local"
                 ? (names[index] || `PLAYER ${index + 1}`)
                 : template.name,
-            // The four starting blue gems are initial score. Later deposits
-            // only reduce this score when an explorer fails to return safely.
+            // Starting gems count immediately; danger only leaves the deposit lost.
             tent: 4,
             wallet: 4,
             roundLoot: 0,
@@ -142,15 +137,11 @@ export const createRoundDeck = function ({
     artifactNumber,
     random = Math.random
 }) {
-    // The values are varied so each reveal creates a different split problem.
     const treasures = TREASURE_VALUES.map(function (value) {
         return {type: "treasure", value, leftover: 0, collected: false};
     });
-    // dangerPool is passed in because duplicate danger cards are removed after
-    // a failed round, so later rounds may not have all 15 danger cards.
+    // Rebuild each round like the table version: remove retired dangers, then shuffle.
     const dangers = DANGER_NAMES.flatMap(function (name) {
-        // This reads the current pool instead of assuming every danger still has
-        // three copies.
         return Array.from(
             {length: dangerPool[name] || 0},
             function () {
@@ -163,7 +154,6 @@ export const createRoundDeck = function ({
         : [{
             type: "artifact",
             number: artifactNumber,
-            // This version scores relics as printed number times 10.
             value: artifactNumber * 10,
             claimed: false
         }];
@@ -181,7 +171,7 @@ export const createRoundDeck = function ({
 export const preparePlayersForRound = function (players, {round = 1} = {}) {
     return players.map(function (player) {
         if (player.dropped || (round >= 5 && player.tent <= 0)) {
-            // A dropped player left the whole match, so later rounds skip them.
+            // In round five, a player who cannot pay is out of the match.
             return {
                 ...cloneExplorer(player),
                 roundLoot: 0,
@@ -192,8 +182,7 @@ export const preparePlayersForRound = function (players, {round = 1} = {}) {
         }
         return {
             ...cloneExplorer(player),
-            // The deposit is paid up front and immediately reflected in the
-            // safe score. A safe return adds it back; danger leaves it lost.
+            // Entry deposit is paid up front and refunded only on safe return.
             tent: player.tent - 1,
             wallet: player.wallet - 1,
             roundLoot: 0,
@@ -211,7 +200,6 @@ export const preparePlayersForRound = function (players, {round = 1} = {}) {
  * @returns {{players: Explorer[], card: GameCard, share: number}} Distribution.
  */
 export const distributeTreasure = function (players, card) {
-    // Non-treasure cards pass through unchanged. This keeps the caller simple.
     if (card.type !== "treasure") {
         return {
             players: players.map(cloneExplorer),
@@ -219,8 +207,7 @@ export const distributeTreasure = function (players, card) {
             share: 0
         };
     }
-    // Treasure is not awarded immediately. It stays on the route until one or
-    // more explorers return to the tent.
+    // Treasure is public route value until a player returns to the tent.
     return {
         players: players.map(cloneExplorer),
         card: {
@@ -237,6 +224,7 @@ const removeClaimedTreasure = function (card, amount) {
         return {card: {...card}, remaining: amount};
     }
     const taken = Math.min(card.leftover || 0, amount);
+    // Drain cards left to right so any remainder has one clear board position.
     return {
         card: {
             ...card,
@@ -268,16 +256,15 @@ export const settleReturningPlayers = function (
     const routeTreasure = revealed.reduce(function (total, card) {
         return total + (card.type === "treasure" ? (card.leftover || 0) : 0);
     }, 0);
-    // When several explorers leave together, leftovers are split between them
-    // but relics are not awarded. A single returning explorer gets the relics.
+    // Shared exits split evenly; indivisible treasure stays on the route.
     const share = leaving.size > 0
         ? Math.floor(routeTreasure / leaving.size)
         : 0;
     const claimRelics = leaving.size === 1;
+    // Relics reward a solo return, not a group exit.
     const claimed = revealed.filter(function (card) {
         return claimRelics && card.type === "artifact" && !card.claimed;
     }).map(function (card) {
-        // Store only the useful scoring fields, not the whole card object.
         return {number: card.number, points: card.value};
     });
     const relicPoints = claimed.reduce(function (total, artifact) {
@@ -327,13 +314,24 @@ export const settleReturningPlayers = function (
  * @param {Explorer[]} players Current explorers.
  * @param {Object<string, number>} dangerPool Remaining danger counts.
  * @param {string} dangerName Duplicated danger.
- * @returns {{players: Explorer[], dangerPool: Object<string, number>}}
+ * @param {Object} [options] Failure options.
+ * @param {string[]} [options.removedDangerTypes=[]] Danger types already removed by earlier failures.
+ * @param {number} [options.maxRemovedDangerTypes=2] Maximum danger types removed across the match.
+ * @returns {{players: Explorer[], dangerPool: Object<string, number>, removedDangerTypes: string[]}}
  */
-export const failRound = function (players, dangerPool, dangerName) {
+export const failRound = function (players, dangerPool, dangerName, {
+    removedDangerTypes = [],
+    maxRemovedDangerTypes = 2
+} = {}) {
+    const alreadyRemoved = removedDangerTypes.includes(dangerName);
+    // Cap retired danger types so late rounds still have real risk.
+    const shouldRemoveDanger = !alreadyRemoved
+        && removedDangerTypes.length < maxRemovedDangerTypes;
+    const nextRemovedDangerTypes = shouldRemoveDanger
+        ? [...removedDangerTypes, dangerName]
+        : [...removedDangerTypes];
     return {
         players: players.map(function (player) {
-            // Safe players keep their tent wealth. Explorers still inside lose
-            // what they are carrying; the deposit was already paid up front.
             return player.active
                 ? {
                     ...cloneExplorer(player),
@@ -342,12 +340,14 @@ export const failRound = function (players, dangerPool, dangerName) {
                 }
                 : cloneExplorer(player);
         }),
-        // This version removes the whole danger type after it breaks a round.
-        // It keeps later decks from repeating the same failure too often.
-        dangerPool: {
-            ...dangerPool,
-            [dangerName]: 0
-        }
+        // Later failures still end the round, but the pool stops shrinking.
+        dangerPool: shouldRemoveDanger
+            ? {
+                ...dangerPool,
+                [dangerName]: 0
+            }
+            : {...dangerPool},
+        removedDangerTypes: nextRemovedDangerTypes
     };
 };
 
@@ -372,7 +372,6 @@ export const scorePlayer = function (player) {
  */
 export const rankPlayers = function (players) {
     return [...players].sort(function (left, right) {
-        // Relic count is only a tie-breaker; points still decide the winner.
         return scorePlayer(right) - scorePlayer(left)
             || right.artifacts.length - left.artifacts.length;
     });
@@ -395,11 +394,11 @@ export const chooseBotAction = function (player, {
     round,
     random = Math.random
 }) {
-    // The bot is intentionally simple: the more danger and carried loot it sees,
-    // the more likely it is to go home.
+    // Simple risk model for a cautious cave buddy.
     const pressure = Object.values(dangerCounts).filter(function (count) {
         return count === 1;
     }).length;
+    // Keep this fuzzy; the bot should feel playable, not mathematically optimal.
     let leaveChance = 0.08 + pressure * 0.1
         + Math.min(player.roundLoot / 38, 0.5);
     leaveChance += artifactOnBoard ? 0.08 : 0;

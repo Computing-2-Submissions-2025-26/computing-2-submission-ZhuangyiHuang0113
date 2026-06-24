@@ -58,11 +58,10 @@
         <div class="container-overview">
         
             
-                <div class="description usertext"><p>Pure game rules for Temple Treasure.</p>
-<p>This module is kept away from the DOM on purpose. The page can look different,
-but these functions still describe the game itself. Every operation receives
-data and returns new data, so a complete game can be simulated in a console
-or a unit test.</p></div>
+                <div class="description usertext"><p>Rules engine for Temple Treasure.</p>
+<p>The browser layer handles artwork, timers and clicks. This file keeps the
+board-game decisions in plain data so the same rules can be tested without a
+page open.</p></div>
             
 
             
@@ -74,11 +73,10 @@ or a unit test.</p></div>
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Pure game rules for Temple Treasure.</p>
-<p>This module is kept away from the DOM on purpose. The page can look different,
-but these functions still describe the game itself. Every operation receives
-data and returns new data, so a complete game can be simulated in a console
-or a unit test.</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Rules engine for Temple Treasure.</p>
+<p>The browser layer handles artwork, timers and clicks. This file keeps the
+board-game decisions in plain data so the same rules can be tested without a
+page open.</p></li></ul></dd>
     
 
     
@@ -185,7 +183,7 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line367">line 367</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line391">line 391</a>
     </li></ul></dd>
     
 
@@ -252,7 +250,7 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line103">line 103</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line101">line 101</a>
     </li></ul></dd>
     
 
@@ -319,7 +317,7 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line137">line 137</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line135">line 135</a>
     </li></ul></dd>
     
 
@@ -380,13 +378,13 @@ or a unit test.</p></li></ul></dd>
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Divide a treasure card equally between active explorers.</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Add a treasure card's value to the unclaimed route pool.</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line206">line 206</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line202">line 202</a>
     </li></ul></dd>
     
 
@@ -426,7 +424,7 @@ or a unit test.</p></li></ul></dd>
 
 
 <div class="description usertext">
-    <p>Divide a treasure card equally between active explorers.</p>
+    <p>Add a treasure card's value to the unclaimed route pool.</p>
 </div>
 
 
@@ -453,7 +451,7 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line312">line 312</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line322">line 322</a>
     </li></ul></dd>
     
 
@@ -514,13 +512,13 @@ or a unit test.</p></li></ul></dd>
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li><p>Pay the deposit and reset explorer state for a new round.</p></li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li><p>Pay the deposit from the wallet and tent score, then reset explorer state.</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line176">line 176</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line171">line 171</a>
     </li></ul></dd>
     
 
@@ -560,7 +558,7 @@ or a unit test.</p></li></ul></dd>
 
 
 <div class="description usertext">
-    <p>Pay the deposit and reset explorer state for a new round.</p>
+    <p>Pay the deposit from the wallet and tent score, then reset explorer state.</p>
 </div>
 
 
@@ -587,7 +585,7 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line348">line 348</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line373">line 373</a>
     </li></ul></dd>
     
 
@@ -649,13 +647,14 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-description">Description:</dt>
     <dd class="tag-description"><ul class="dummy"><li><p>Return an explorer's final score.</p>
-<p>Relic points are already secured in the tent when claimed.</p></li></ul></dd>
+<p>Initial gems, secured treasure and relic points live in the tent score.
+Wallet gems only pay future deposits; they do not count again.</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line338">line 338</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line363">line 363</a>
     </li></ul></dd>
     
 
@@ -696,7 +695,8 @@ or a unit test.</p></li></ul></dd>
 
 <div class="description usertext">
     <p>Return an explorer's final score.</p>
-<p>Relic points are already secured in the tent when claimed.</p>
+<p>Initial gems, secured treasure and relic points live in the tent score.
+Wallet gems only pay future deposits; they do not count again.</p>
 </div>
 
 
@@ -718,14 +718,15 @@ or a unit test.</p></li></ul></dd>
     
     <dt class="tag-description">Description:</dt>
     <dd class="tag-description"><ul class="dummy"><li><p>Resolve explorers returning to their tents.</p>
-<p>Returning explorers share all route leftovers, recover their deposit and
-secure carried loot. A relic is claimed only if exactly one explorer leaves.</p></li></ul></dd>
+<p>Returning explorers share all route leftovers, recover their deposit in the
+wallet and secure carried loot. A relic is claimed only if exactly one
+explorer leaves.</p></li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line243">line 243</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line250">line 250</a>
     </li></ul></dd>
     
 
@@ -766,8 +767,9 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
 
 <div class="description usertext">
     <p>Resolve explorers returning to their tents.</p>
-<p>Returning explorers share all route leftovers, recover their deposit and
-secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
+<p>Returning explorers share all route leftovers, recover their deposit in the
+wallet and secure carried loot. A relic is claimed only if exactly one
+explorer leaves.</p>
 </div>
 
 
@@ -794,7 +796,7 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line79">line 79</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -866,7 +868,7 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line13">line 13</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line12">line 12</a>
     </li></ul></dd>
     
 
@@ -943,7 +945,7 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line15">line 15</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -1310,7 +1312,7 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line12">line 12</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -1384,7 +1386,7 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line30">line 30</a>
+        <a href="TempleTreasure.js.html">TempleTreasure.js</a>, <a href="TempleTreasure.js.html#line29">line 29</a>
     </li></ul></dd>
     
 
@@ -1575,6 +1577,38 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
 
         <tr>
             
+                <td class="name"><code>collected</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Whether treasure has been taken from this card.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>name</code></td>
             
 
@@ -1680,7 +1714,7 @@ secure carried loot. A relic is claimed only if exactly one explorer leaves.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Wed Jun 17 2026 02:01:49 GMT+0800 (中国标准时间) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Wed Jun 24 2026 00:31:16 GMT+0800 (中国标准时间) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
