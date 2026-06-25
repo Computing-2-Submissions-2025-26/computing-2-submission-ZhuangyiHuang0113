@@ -17,6 +17,15 @@ I used its central push-your-luck idea: players can continue deeper into the cav
 for more treasure, but a repeated danger can wipe out the loot carried by anyone
 still inside.
 
+This version adapts that reference into a browser game with:
+
+- a five-round match structure;
+- a visible 20-card route each round;
+- entry deposits paid with blue gems;
+- solo-return relic rewards;
+- local multiplayer or bot opponents;
+- a guided How To Play carousel with spotlight screenshots.
+
 ## Audio credits and copyright notice
 
 This project includes background music to support the atmosphere of the game.
@@ -30,14 +39,7 @@ Music used:
 All rights to the music remain with the original artists and copyright holders.
 No ownership of the music is claimed in this project.
 
-This version adapts that reference into a browser game with:
 
-- a five-round match structure;
-- a visible 20-card route each round;
-- entry deposits paid with blue gems;
-- solo-return relic rewards;
-- local multiplayer or bot opponents;
-- a guided How To Play carousel with spotlight screenshots.
 
 ## How to play
 
