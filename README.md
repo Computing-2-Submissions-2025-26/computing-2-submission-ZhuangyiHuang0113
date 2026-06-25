@@ -17,6 +17,19 @@ I used its central push-your-luck idea: players can continue deeper into the cav
 for more treasure, but a repeated danger can wipe out the loot carried by anyone
 still inside.
 
+## Audio credits and copyright notice
+
+This project includes background music to support the atmosphere of the game.
+The audio is used only for non-commercial educational coursework demonstration.
+
+Music used:
+
+- **Ocarina Song** by **EuroMartina**
+- **Sun Circle** by **Ah Nee Mah**
+
+All rights to the music remain with the original artists and copyright holders.
+No ownership of the music is claimed in this project.
+
 This version adapts that reference into a browser game with:
 
 - a five-round match structure;
