@@ -12,8 +12,8 @@ Each round becomes a small psychological battle: return too early and you may mi
 
 ## Game reference
 
-The main design is inspired by the tabletop game **[Incan Gold / Diamant](https://boardgamegeek.com/boardgame/15512/diamant)**.I
-used its central push-your-luck idea: players can continue deeper into the cave
+The main design is inspired by the tabletop game **[Incan Gold / Diamant](https://boardgamegeek.com/boardgame/15512/diamant)**.
+I used its central push-your-luck idea: players can continue deeper into the cave
 for more treasure, but a repeated danger can wipe out the loot carried by anyone
 still inside.
 
