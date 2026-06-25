@@ -120,6 +120,17 @@ Current covered behaviours include:
 
 JSDoc comments in `GreedyLittleExplorers.js` generate the API pages in `docs/`.
 
+## AI References
+
+AI was used to:
+
+- Help create the basic UI layout for the browser game.
+- Suggest improvements for visual effects and detailed game interface polish.
+- Assist with parts of `main.js`, especially non-API logic.
+- Provide debugging guidance when runtime issues occurred during development.
+- Help refine wording, rule explanations and project documentation.
+
+
 ## How to run
 
 - Clone the repository.
