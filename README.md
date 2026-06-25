@@ -2,9 +2,11 @@
 
 **CID:** 02573495.
 
-Greedy Little Explorers is a browser-based push-your-luck board game. Players
-explore a dangerous temple route over five rounds, reveal treasure, danger and
-relic cards, then decide whether to keep going or return safely to camp.
+Greedy Little Explorers is a browser-based push-your-luck strategy board game about greed, risk and terrible cave decisions. Players enter a cursed temple, reveal treasure, danger and relic cards, then choose whether to escape safely or gamble on one more step.
+
+Each round becomes a small psychological battle: return too early and you may miss the best treasure; stay too long and one repeated danger can wipe out everything you carried.
+
+**Go deeper. Get greedy. Try not to die.**
 
 ![Greedy Little Explorers tutorial screenshot](web-app/assets/tutorial/guide-04-choose.png)
 
@@ -129,19 +131,3 @@ For example, this can be done with the Live Server extension in VS Code.
 Double-clicking the HTML file may block module imports or audio in some
 browsers, so a local server is recommended.
 
-## Coursework checklist
-
-- [x] Browser game implemented in HTML, CSS and JavaScript.
-- [x] Independent API module included in `web-app/GreedyLittleExplorers.js`.
-- [x] API module documented with JSDoc comments.
-- [x] Generated JSDoc documentation included in `docs/`.
-- [x] Written test specification included in `web-app/tests/`.
-- [x] Mocha unit tests included and passing.
-- [x] `package-lock.json` included for repeatable installs.
-- [x] `node_modules/` ignored by `.gitignore`.
-
-## Submission notes
-
-- Replace the CID line at the top before final submission.
-- Do not submit `node_modules/`; it is ignored by `.gitignore`.
-- Keep `package-lock.json` so npm installs the same tool versions.
