@@ -11,7 +11,7 @@ import {
   rankPlayers,
   scorePlayer,
   settleReturningPlayers
-} from "./TempleTreasure.js";
+} from "./GreedyLittleExplorers.js";
 
 const screens = [...document.querySelectorAll(".screen")];
 const boardEl = document.querySelector("#board");
@@ -102,7 +102,7 @@ const characterLibrary = Object.freeze([
 ]);
 
 // Browser state for the current play session.
-// This is deliberately separate from TempleTreasure.js. The pure rule module
+// This is deliberately separate from GreedyLittleExplorers.js. The pure rule module
 // is like the "backend" part; this object is the live browser/controller part.
 const state = {
   round: 1,
@@ -635,7 +635,7 @@ function revealLandedCard() {
 }
 
 function resolveRevealedCard(card, newReveal = true) {
-  // After the reveal animation, the real rule result is applied from TempleTreasure.js.
+  // After the reveal animation, the real rule result is applied from GreedyLittleExplorers.js.
   renderBoard();
   if (!newReveal) {
     if (card.type === "treasure") {

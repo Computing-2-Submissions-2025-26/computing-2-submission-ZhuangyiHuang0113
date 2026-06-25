@@ -1,13 +1,13 @@
 {
-  "name": "inca-treasure-computing-2",
+  "name": "greedy-little-explorers-computing-2",
   "version": "1.0.0",
   "type": "module",
   "description": "A turn-based board game web application for Computing 2.",
-  "main": "web-app/IncaTreasure.js",
+  "main": "web-app/GreedyLittleExplorers.js",
   "scripts": {
     "test": "mocha",
     "docs": "jsdoc -c jsdoc.json",
-    "lint": "node --check web-app/IncaTreasure.js && node --check web-app/main.js && node --check web-app/tests/IncaTreasure.test.js"
+    "lint": "node --check web-app/GreedyLittleExplorers.js && node --check web-app/main.js && node --check web-app/tests/GreedyLittleExplorers.test.js"
   },
   "devDependencies": {
     "docdash": "^2.0.2",

@@ -1,12 +1,12 @@
-# Temple Treasure
+# Greedy Little Explorers
 
 **CID:** 02573495.
 
-Temple Treasure is a browser-based push-your-luck board game. Players explore a
-dangerous temple route over five rounds, reveal treasure, danger and relic cards,
-then decide whether to keep going or return safely to camp.
+Greedy Little Explorers is a browser-based push-your-luck board game. Players
+explore a dangerous temple route over five rounds, reveal treasure, danger and
+relic cards, then decide whether to keep going or return safely to camp.
 
-![Temple Treasure tutorial screenshot](web-app/assets/tutorial/guide-04-choose.png)
+![Greedy Little Explorers tutorial screenshot](web-app/assets/tutorial/guide-04-choose.png)
 
 ## Game reference
 
@@ -43,14 +43,14 @@ After five rounds, the highest secured score wins. Relic count breaks score ties
 
 ## Code structure
 
-- `web-app/TempleTreasure.js` - the DOM-free rules module and public API.
+- `web-app/GreedyLittleExplorers.js` - the DOM-free rules module and public API.
 - `web-app/main.js` - browser UI state, input handling, timers, animation and
   audio.
 - `web-app/index.html` - menu, rules carousel, game screen, settings and final
   ranking markup.
 - `web-app/default.css` - board layout, cards, characters, popups and responsive
   visual styling.
-- `web-app/tests/TempleTreasure.test.js` - Mocha unit tests for the rules module.
+- `web-app/tests/GreedyLittleExplorers.test.js` - Mocha unit tests for the rules module.
 - `web-app/tests/TEST-SPECIFICATION.md` - written test plan with inputs and
   expected results.
 - `docs/` - generated JSDoc API documentation.
@@ -59,7 +59,7 @@ The artwork, audio and tutorial images are stored in `web-app/assets/`.
 
 ## Rules module and API
 
-The core game logic is separated from the browser. `TempleTreasure.js` uses plain
+The core game logic is separated from the browser. `GreedyLittleExplorers.js` uses plain
 JavaScript data and pure-style functions so the rules can be tested without
 opening the page. The UI calls this module instead of duplicating score, deck or
 danger logic in the DOM layer.
@@ -101,7 +101,7 @@ Current covered behaviours include:
 - duplicate danger failure and danger removal limits;
 - final ranking and tie-breaking.
 
-JSDoc comments in `TempleTreasure.js` generate the API pages in `docs/`.
+JSDoc comments in `GreedyLittleExplorers.js` generate the API pages in `docs/`.
 
 ## How to run
 
@@ -132,7 +132,7 @@ browsers, so a local server is recommended.
 ## Coursework checklist
 
 - [x] Browser game implemented in HTML, CSS and JavaScript.
-- [x] Independent API module included in `web-app/TempleTreasure.js`.
+- [x] Independent API module included in `web-app/GreedyLittleExplorers.js`.
 - [x] API module documented with JSDoc comments.
 - [x] Generated JSDoc documentation included in `docs/`.
 - [x] Written test specification included in `web-app/tests/`.

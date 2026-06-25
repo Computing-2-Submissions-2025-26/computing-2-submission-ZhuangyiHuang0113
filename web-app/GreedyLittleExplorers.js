@@ -1,58 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    
-    <meta charset="utf-8">
-    <title>TempleTreasure.js - Documentation</title>
-    
-    
-    <script src="scripts/prettify/prettify.js"></script>
-    <script src="scripts/prettify/lang-css.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
-    <script src="scripts/nav.js" defer></script>
-    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-
-<input type="checkbox" id="nav-trigger" class="nav-trigger" />
-<label for="nav-trigger" class="navicon-button x">
-  <div class="navicon"></div>
-</label>
-
-<label for="nav-trigger" class="overlay"></label>
-
-<nav >
-    
-    
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-TempleTreasure.html">TempleTreasure</a><ul class='members'><li data-type='member'><a href="module-TempleTreasure.html#.chooseBotAction">chooseBotAction</a></li><li data-type='member'><a href="module-TempleTreasure.html#.createPlayers">createPlayers</a></li><li data-type='member'><a href="module-TempleTreasure.html#.createRoundDeck">createRoundDeck</a></li><li data-type='member'><a href="module-TempleTreasure.html#.distributeTreasure">distributeTreasure</a></li><li data-type='member'><a href="module-TempleTreasure.html#.failRound">failRound</a></li><li data-type='member'><a href="module-TempleTreasure.html#.preparePlayersForRound">preparePlayersForRound</a></li><li data-type='member'><a href="module-TempleTreasure.html#.rankPlayers">rankPlayers</a></li><li data-type='member'><a href="module-TempleTreasure.html#.scorePlayer">scorePlayer</a></li><li data-type='member'><a href="module-TempleTreasure.html#.settleReturningPlayers">settleReturningPlayers</a></li><li data-type='member'><a href="module-TempleTreasure.html#.shuffle">shuffle</a></li></ul></li></ul>
-    
-</nav>
-
-<div id="main">
-    
-    <h1 class="page-title">TempleTreasure.js</h1>
-    
-
-    
-
-
-
-    
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Rules engine for Temple Treasure.
+/**
+ * Rules engine for Greedy Little Explorers.
  *
  * The browser layer handles artwork, timers and clicks. This file keeps the
  * board-game decisions in plain data so the same rules can be tested without a
  * page open.
  *
- * @module TempleTreasure
+ * @module GreedyLittleExplorers
  */
 
 /** @typedef {"continue"|"leave"} ExplorerChoice */
@@ -66,7 +19,7 @@
  * @property {number} tent Points secured in the tent.
  * @property {number} wallet Gems available for future deposits.
  * @property {number} roundLoot Unsecured points carried in the cave.
- * @property {Array&lt;{number:number, points:number}>} artifacts Claimed relics.
+ * @property {Array<{number:number, points:number}>} artifacts Claimed relics.
  * @property {boolean} active Whether the explorer remains in the cave.
  * @property {boolean} dropped Whether the explorer has left the whole game.
  * @property {ExplorerChoice|null} choice Current secret choice.
@@ -117,9 +70,9 @@ const cloneExplorer = function (player) {
 /**
  * Return a shuffled copy without modifying the source collection.
  *
- * @param {Array&lt;*>} items Values to shuffle.
+ * @param {Array<*>} items Values to shuffle.
  * @param {Function} [random=Math.random] Number generator in the range [0, 1).
- * @returns {Array&lt;*>} Shuffled copy.
+ * @returns {Array<*>} Shuffled copy.
  */
 export const shuffle = function (items, random = Math.random) {
     const result = [...items];
@@ -165,7 +118,7 @@ export const createPlayers = function ({
             active: true,
             dropped: false,
             choice: null,
-            isBot: mode === "bots" &amp;&amp; index > 0
+            isBot: mode === "bots" && index > 0
         };
     });
 };
@@ -174,7 +127,7 @@ export const createPlayers = function ({
  * Create the card deck for one expedition round.
  *
  * @param {Object} options Round setup.
- * @param {Object&lt;string, number>} options.dangerPool Remaining danger counts.
+ * @param {Object<string, number>} options.dangerPool Remaining danger counts.
  * @param {number|null} options.artifactNumber Relic added this round.
  * @param {Function} [options.random=Math.random] Shuffle generator.
  * @returns {GameCard[]} New shuffled round deck.
@@ -217,7 +170,7 @@ export const createRoundDeck = function ({
  */
 export const preparePlayersForRound = function (players, {round = 1} = {}) {
     return players.map(function (player) {
-        if (player.dropped || (round >= 5 &amp;&amp; player.tent &lt;= 0)) {
+        if (player.dropped || (round >= 5 && player.tent <= 0)) {
             // In round five, a player who cannot pay is out of the match.
             return {
                 ...cloneExplorer(player),
@@ -267,7 +220,7 @@ export const distributeTreasure = function (players, card) {
 };
 
 const removeClaimedTreasure = function (card, amount) {
-    if (card.type !== "treasure" || amount &lt;= 0) {
+    if (card.type !== "treasure" || amount <= 0) {
         return {card: {...card}, remaining: amount};
     }
     const taken = Math.min(card.leftover || 0, amount);
@@ -310,7 +263,7 @@ export const settleReturningPlayers = function (
     const claimRelics = leaving.size === 1;
     // Relics reward a solo return, not a group exit.
     const claimed = revealed.filter(function (card) {
-        return claimRelics &amp;&amp; card.type === "artifact" &amp;&amp; !card.claimed;
+        return claimRelics && card.type === "artifact" && !card.claimed;
     }).map(function (card) {
         return {number: card.number, points: card.value};
     });
@@ -342,12 +295,12 @@ export const settleReturningPlayers = function (
     });
     let claimedTreasure = share * leaving.size;
     const updatedRoute = revealed.map(function (card) {
-        if (card.type === "treasure" &amp;&amp; leaving.size > 0) {
+        if (card.type === "treasure" && leaving.size > 0) {
             const result = removeClaimedTreasure(card, claimedTreasure);
             claimedTreasure = result.remaining;
             return result.card;
         }
-        if (claimRelics &amp;&amp; card.type === "artifact" &amp;&amp; !card.claimed) {
+        if (claimRelics && card.type === "artifact" && !card.claimed) {
             return {...card, claimed: true};
         }
         return {...card};
@@ -359,12 +312,12 @@ export const settleReturningPlayers = function (
  * Apply a duplicate danger failure.
  *
  * @param {Explorer[]} players Current explorers.
- * @param {Object&lt;string, number>} dangerPool Remaining danger counts.
+ * @param {Object<string, number>} dangerPool Remaining danger counts.
  * @param {string} dangerName Duplicated danger.
  * @param {Object} [options] Failure options.
  * @param {string[]} [options.removedDangerTypes=[]] Danger types already removed by earlier failures.
  * @param {number} [options.maxRemovedDangerTypes=2] Maximum danger types removed across the match.
- * @returns {{players: Explorer[], dangerPool: Object&lt;string, number>, removedDangerTypes: string[]}}
+ * @returns {{players: Explorer[], dangerPool: Object<string, number>, removedDangerTypes: string[]}}
  */
 export const failRound = function (players, dangerPool, dangerName, {
     removedDangerTypes = [],
@@ -373,7 +326,7 @@ export const failRound = function (players, dangerPool, dangerName, {
     const alreadyRemoved = removedDangerTypes.includes(dangerName);
     // Cap retired danger types so late rounds still have real risk.
     const shouldRemoveDanger = !alreadyRemoved
-        &amp;&amp; removedDangerTypes.length &lt; maxRemovedDangerTypes;
+        && removedDangerTypes.length < maxRemovedDangerTypes;
     const nextRemovedDangerTypes = shouldRemoveDanger
         ? [...removedDangerTypes, dangerName]
         : [...removedDangerTypes];
@@ -429,7 +382,7 @@ export const rankPlayers = function (players) {
  *
  * @param {Explorer} player Bot explorer.
  * @param {Object} context Visible round information.
- * @param {Object&lt;string, number>} context.dangerCounts Revealed dangers.
+ * @param {Object<string, number>} context.dangerCounts Revealed dangers.
  * @param {boolean} context.artifactOnBoard Whether an unclaimed relic is shown.
  * @param {number} context.round Current round.
  * @param {Function} [context.random=Math.random] Random generator.
@@ -450,32 +403,5 @@ export const chooseBotAction = function (player, {
         + Math.min(player.roundLoot / 38, 0.5);
     leaveChance += artifactOnBoard ? 0.08 : 0;
     leaveChance += round === 5 ? 0.05 : 0;
-    return random() &lt; leaveChance ? "leave" : "continue";
+    return random() < leaveChance ? "leave" : "continue";
 };
-</code></pre>
-        </article>
-    </section>
-
-
-
-
-    
-    
-</div>
-
-<br class="clear">
-
-<footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Wed Jun 24 2026 21:04:03 GMT+0800 (中国标准时间) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
-</footer>
-
-<script>prettyPrint();</script>
-<script src="scripts/polyfill.js"></script>
-<script src="scripts/linenumber.js"></script>
-
-
-
-    <link type="text/css" rel="stylesheet" href="custom.css">
-    
-</body>
-</html>
