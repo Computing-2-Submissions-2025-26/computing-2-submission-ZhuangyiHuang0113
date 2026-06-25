@@ -160,6 +160,7 @@
       <!-- Fixed game controls in the corner. -->
       <div class="game-tools" aria-label="Game controls">
         <button id="pause-button" class="tool-button" type="button" aria-label="Pause game">PAUSE</button>
+        <button id="rules-tool-button" class="tool-button rules-tool-button" type="button" aria-label="Open rules">RULES</button>
         <button id="settings-button" class="tool-button settings-button" type="button" aria-label="Open settings">SETTINGS</button>
       </div>
 
@@ -191,6 +192,19 @@
         </div>
       </div>
 
+      <!-- Rules popup. This reuses the How To Play copy without leaving the game. -->
+      <div id="rules-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="rules-title">
+        <div class="result-card panel rules-card-dialog">
+          <div class="pattern-bar"></div>
+          <h2 id="rules-title">RULES</h2>
+          <div class="settings-rules-summary game-rules-summary">
+            <h3>HOW TO PLAY</h3>
+            <div id="game-rules-track" class="settings-rules-track"></div>
+          </div>
+          <button id="close-rules-button" class="menu-button primary">CLOSE</button>
+        </div>
+      </div>
+
       <!-- Settings popup. Rules are cloned from the How To Play slides. -->
       <div id="settings-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="result-card panel settings-card">
@@ -199,11 +213,6 @@
           <label for="volume-slider">BACKGROUND SOUND VOLUME</label>
           <input id="volume-slider" type="range" min="0" max="100" value="60">
           <button id="settings-sound-button" class="menu-button">SOUND ON</button>
-          <button id="settings-rules-button" class="menu-button">VIEW RULES</button>
-          <div id="settings-rules-summary" class="settings-rules-summary hidden">
-            <h3>HOW TO PLAY</h3>
-            <div id="settings-rules-track" class="settings-rules-track"></div>
-          </div>
           <button id="close-settings-button" class="menu-button primary">CLOSE</button>
         </div>
       </div>

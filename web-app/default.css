@@ -3245,11 +3245,13 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 
 #message-overlay,
 #pause-overlay,
+#rules-overlay,
 #settings-overlay {
   z-index: 120;
 }
 
 #settings-overlay .settings-card,
+#rules-overlay .rules-card-dialog,
 #pause-overlay .pause-card,
 #message-overlay .result-card {
   position: relative;

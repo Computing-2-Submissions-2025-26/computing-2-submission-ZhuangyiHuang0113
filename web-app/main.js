@@ -50,12 +50,13 @@ const tutorialSlides = [...document.querySelectorAll(".tutorial-slide")];
 const tutorialDots = document.querySelector("#tutorial-dots");
 const diceButton = document.querySelector("#dice-button");
 const pauseButton = document.querySelector("#pause-button");
+const rulesToolButton = document.querySelector("#rules-tool-button");
 const pauseOverlay = document.querySelector("#pause-overlay");
+const rulesOverlay = document.querySelector("#rules-overlay");
 const settingsOverlay = document.querySelector("#settings-overlay");
 const soundButton = document.querySelector("#sound-button");
 const settingsSoundButton = document.querySelector("#settings-sound-button");
-const settingsRulesSummary = document.querySelector("#settings-rules-summary");
-const settingsRulesTrack = document.querySelector("#settings-rules-track");
+const gameRulesTrack = document.querySelector("#game-rules-track");
 const volumeSlider = document.querySelector("#volume-slider");
 
 const bgmTracks = Object.freeze({
@@ -336,14 +337,14 @@ function renderInventory() {
     : "NONE";
   if (shouldHideInventory()) {
     inventoryEl.innerHTML = `
-      <div class="inventory-title"><span>PLAYER PACK</span></div>
+      <div class="inventory-title"><span>${packTitle(player)}</span></div>
       <div class="inventory-private">Private until the choice step.</div>
     `;
     return;
   }
   inventoryEl.innerHTML = `
     <div class="inventory-title">
-      <span>${player.name}'S PACK</span>
+      <span>${packTitle(player)}</span>
       <details class="pack-help">
         <summary aria-label="Explain Your Pack">?</summary>
         <div>
@@ -365,9 +366,16 @@ function currentRoundPackTotal(player) {
   return player.tent - roundStart + player.roundLoot + routePool;
 }
 
+function packTitle(player) {
+  return `${player?.name || "PLAYER"} PACK`;
+}
+
 function inventoryPlayer() {
   if (state.gameMode === "local" && state.phase === "decision") {
     return state.localChoiceQueue[state.localChoiceIndex] || null;
+  }
+  if (state.gameMode === "local") {
+    return state.players[state.currentTurn] || state.players[0] || null;
   }
   return state.players.find(player => player.id === "you") || state.players[0] || null;
 }
@@ -1331,8 +1339,8 @@ function clearGameOverlays() {
   state.localChoicePromptOpen = false;
   hideResult();
   pauseOverlay.classList.add("hidden");
+  rulesOverlay.classList.add("hidden");
   settingsOverlay.classList.add("hidden");
-  settingsRulesSummary.classList.add("hidden");
   choiceRevealStage.classList.add("hidden");
   choiceRevealStage.classList.remove("show-results");
   document.querySelector("#game-screen")?.classList.remove("paused");
@@ -1463,17 +1471,21 @@ volumeSlider.addEventListener("input", event => {
 pauseButton.addEventListener("click", pauseGame);
 document.querySelector("#resume-button").addEventListener("click", resumeGame);
 document.querySelector("#pause-menu-button").addEventListener("click", leaveGameForMenu);
+rulesToolButton.addEventListener("click", () => {
+  diceButton.classList.add("hidden");
+  rulesOverlay.classList.remove("hidden");
+});
+document.querySelector("#close-rules-button").addEventListener("click", () => {
+  rulesOverlay.classList.add("hidden");
+  if (state.phase === "ready") diceButton.classList.remove("hidden");
+});
 document.querySelector("#settings-button").addEventListener("click", () => {
   diceButton.classList.add("hidden");
   settingsOverlay.classList.remove("hidden");
 });
 document.querySelector("#close-settings-button").addEventListener("click", () => {
   settingsOverlay.classList.add("hidden");
-  settingsRulesSummary.classList.add("hidden");
   if (state.phase === "ready") diceButton.classList.remove("hidden");
-});
-document.querySelector("#settings-rules-button").addEventListener("click", () => {
-  settingsRulesSummary.classList.toggle("hidden");
 });
 document.querySelector("#final-replay-button").addEventListener("click", () => startGame(state.gameMode));
 document.querySelector("#final-menu-button").addEventListener("click", () => showScreen("menu-screen"));
@@ -1581,9 +1593,9 @@ function createCharacterFigure(characterId, color, extraClass = "") {
 }
 
 function buildSettingsRules() {
-  // Settings reuses the same rule copy as the home How to Play page.
+  // The in-game Rules popup reuses the same copy as the home How to Play page.
   // This avoids two different versions of the rules drifting apart.
-  settingsRulesTrack.replaceChildren(...tutorialSlides.map(slide => {
+  gameRulesTrack.replaceChildren(...tutorialSlides.map(slide => {
     const item = document.createElement("article");
     item.className = "settings-rule-item";
     const copy = slide.querySelector(".tutorial-copy")?.cloneNode(true);
