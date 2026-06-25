@@ -12,7 +12,7 @@ Each round becomes a small psychological battle: return too early and you may mi
 
 ## Game reference
 
-The main design is inspired by the tabletop game **Incan Gold / Diamant**. I
+The main design is inspired by the tabletop game **[Incan Gold / Diamant](https://boardgamegeek.com/boardgame/15512/diamant)**.I
 used its central push-your-luck idea: players can continue deeper into the cave
 for more treasure, but a repeated danger can wipe out the loot carried by anyone
 still inside.
@@ -107,27 +107,9 @@ JSDoc comments in `GreedyLittleExplorers.js` generate the API pages in `docs/`.
 
 ## How to run
 
-Install dependencies once:
+- Clone the repository.
+- Open the project folder in VS Code.
+- Run `npm install` in the root directory to install dependencies.
 
 ```bash
 npm install
-```
-
-Run the checks:
-
-```bash
-npm test
-npm run docs
-npm run lint
-```
-
-To play, serve the project with a local web server and open:
-
-```text
-http://127.0.0.1:5500/web-app/index.html
-```
-
-For example, this can be done with the Live Server extension in VS Code.
-Double-clicking the HTML file may block module imports or audio in some
-browsers, so a local server is recommended.
-
