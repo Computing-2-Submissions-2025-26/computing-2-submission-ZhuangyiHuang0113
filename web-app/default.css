@@ -2778,7 +2778,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   }
 }
 
-/* Later layout fixes: smaller tents, bigger route cards, corner controls. */
+/* Layout adjustments: smaller tents, bigger route cards, corner controls. */
 .sound-toggle,
 .fullscreen-toggle {
   width: auto;
@@ -4243,7 +4243,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   background: linear-gradient(#fff3bf, #e8bd64);
 }
 
-/* Current rules copy is text-only; screenshots can be restored later. */
+/* Rules copy layout. */
 .tutorial-slide {
   grid-template-columns: 1fr;
   min-height: 430px;
@@ -4851,7 +4851,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   font: 1000 clamp(14px, 1.1vw, 20px) Arial, sans-serif;
 }
 
-/* Home rules keep the original screenshot-and-copy layout, using placeholder PNGs for now. */
+/* Home rules keep the screenshot-and-copy tutorial layout. */
 #rules-screen .tutorial-slide {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(300px, .9fr);
@@ -5147,7 +5147,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   bottom: -10px;
 }
 
-/* 精简路线修复：只补左右拐角横线，不压卡牌 */
+/* Route guide overlay: draw the side turns without covering cards. */
 .board {
   position: relative;
   overflow: visible;
@@ -5171,7 +5171,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   display: none !important;
 }
 
-/* START 左侧入口：向右 */
+/* START entry: left side pointing right. */
 .route-entry.top-entry {
   left: -3.2%;
   top: 16.5%;
@@ -5189,7 +5189,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   border-left: 13px solid #111;
 }
 
-/* 右侧：第一排出来 -> 向下 -> 第二排向左 */
+/* Right turn: first row exits, drops down, then points left to the second row. */
 .right-turn {
   left: 99%;
   top: 16.5%;
@@ -5228,7 +5228,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   border-right: 13px solid #111;
 }
 
-/* 左侧：第二排出来 -> 向下 -> 第三排向右 */
+/* Left turn: second row exits, drops down, then points right to the third row. */
 .left-turn {
   left: -3.2%;
   top: 49.8%;
@@ -5266,7 +5266,7 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
   border-bottom: 8px solid transparent;
   border-left: 13px solid #111;
 }
-/* 背包说明弹窗置顶：防止被 CURRENT ROUND 或卡牌盖住 */
+/* Keep pack help above the round label and cards. */
 .player-inventory {
   z-index: 3;
   overflow: visible !important;
@@ -5310,4 +5310,12 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 #card-reveal-stage,
 #choice-reveal-stage {
   cursor: pointer;
+}
+
+/* Strong visible focus for keyboard users. */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 4px solid #fff3a7;
+  outline-offset: 3px;
 }

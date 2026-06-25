@@ -76,7 +76,7 @@ const cloneExplorer = function (player) {
  */
 export const shuffle = function (items, random = Math.random) {
     const result = [...items];
-    // Fisher-Yates keeps the API deterministic when tests pass fake randomness.
+    // Fisher-Yates keeps the API deterministic when tests pass a fixed random source.
     let index = result.length - 1;
     while (index > 0) {
         const swapIndex = Math.floor(random() * (index + 1));

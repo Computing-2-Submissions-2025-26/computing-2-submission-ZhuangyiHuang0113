@@ -59,7 +59,7 @@ const settingsRulesTrack = document.querySelector("#settings-rules-track");
 const volumeSlider = document.querySelector("#volume-slider");
 
 const bgmTracks = Object.freeze({
-  // Temporary local music files. Replace the mp3 files later if a better pair is picked.
+  // Background music used by the menu and game screens.
   menu: "assets/audio/menu-bgm.mp3",
   game: "assets/audio/game-bgm.mp3"
 });
@@ -461,12 +461,18 @@ function createCardElement(card) {
   const el = document.createElement("div");
   el.className = `card ${card.type}`;
   if (card.type === "treasure") {
+    const routeTreasure = card.leftover || 0;
+    const previousTreasure = card.displayLeftover ?? (
+      card.collected
+        ? routeTreasure
+        : Math.max(routeTreasure - card.value, 0)
+    );
     const showMainGems = !card.collected;
     el.innerHTML = `
       <div class="card-type">TREASURE</div>
+      ${createLeftoverGems(previousTreasure)}
       ${showMainGems ? createGemCluster(card.value, "card-gem-cluster") : ""}
       <div class="card-value">${card.value}</div>
-      ${card.collected ? createLeftoverGems(card.leftover || 0) : ""}
     `;
   } else if (card.type === "danger") {
     el.innerHTML = `
@@ -700,7 +706,10 @@ function showFeaturedCard(card, onComplete) {
     onComplete();
   };
 
-  featuredCard.replaceChildren(createCardElement(card));
+  const displayCard = card.type === "treasure"
+    ? {...card, collected: false, displayLeftover: card.leftover || 0}
+    : card;
+  featuredCard.replaceChildren(createCardElement(displayCard));
   flyingGems.replaceChildren();
   if (card.type === "treasure") createFlyingGems(card.value);
   featuredCardLabel.textContent = card.type === "treasure"
@@ -1299,7 +1308,7 @@ function clearTimer() {
 
 function updatePlayerNameFields() {
   // The visible name boxes always match the selected player count. Empty boxes
-  // keep a placeholder instead of pretending to be bot names.
+  // keep the default placeholder text.
   const count = Number(playerCountSelect.value);
   state.localPlayerCount = count;
   localNameInputs.forEach((input, index) => {

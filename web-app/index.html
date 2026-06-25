@@ -72,7 +72,7 @@
               </article>
               <article class="tutorial-slide">
                 <div class="tutorial-shot shot-treasure"><img src="assets/tutorial/guide-02-card-pool.png" alt="Card pool spotlight guide"></div>
-                <div class="tutorial-copy"><span>02</span><h3>CARD POOL</h3><p>35 cards total:</p><p>15 Treasure + 15 Danger + 5 Relics.</p><p>Each round: draw 20 cards onto the route.</p><p>Relic values: 1=10, 2=20, 3=30, 4=40, 5=50 pts.</p></div>
+                <div class="tutorial-copy"><span>02</span><h3>CARD POOL</h3><p>35 cards total:</p><p>15 Treasure + 15 Danger + 5 Relics.</p><p>Each round: draw 20 cards from Treasure & Danger onto the route.</p><p>Relic values: 1=10, 2=20, 3=30, 4=40, 5=50 pts.</p></div>
               </article>
               <article class="tutorial-slide">
                 <div class="tutorial-shot shot-choice"><img src="assets/tutorial/guide-03-move-reveal.png" alt="Move and reveal spotlight guide"></div>
@@ -90,7 +90,6 @@
             <button id="tutorial-next" class="tutorial-arrow" aria-label="Next rule">&rarr;</button>
           </div>
           <div id="tutorial-dots" class="tutorial-dots" aria-label="Tutorial pages"></div>
-          <!-- <p class="rules-spec">SCREENSHOTS ARE PLACEHOLDERS AND CAN BE UPDATED LATER.</p> -->
         </div>
       </div>
     </section>
@@ -170,7 +169,7 @@
       </div>
 
       <!-- Reused popup for round starts, pass-device messages and endings. -->
-      <div id="message-overlay" class="overlay hidden">
+      <div id="message-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
         <div class="result-card panel">
           <div class="pattern-bar"></div>
           <h2 id="overlay-title"></h2>
@@ -182,10 +181,10 @@
       </div>
 
       <!-- Pause popup. Board stays behind it, just dimmed. -->
-      <div id="pause-overlay" class="overlay hidden">
+      <div id="pause-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title">
         <div class="result-card panel pause-card">
           <div class="pattern-bar"></div>
-          <h2>PAUSED</h2>
+          <h2 id="pause-title">PAUSED</h2>
           <p>The cave is waiting. Continue the same round or return to the main menu.</p>
           <button id="resume-button" class="menu-button primary">CONTINUE GAME</button>
           <button id="pause-menu-button" class="menu-button home-button">HOME - MAIN MENU</button>
@@ -193,10 +192,10 @@
       </div>
 
       <!-- Settings popup. Rules are cloned from the How To Play slides. -->
-      <div id="settings-overlay" class="overlay hidden">
+      <div id="settings-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div class="result-card panel settings-card">
           <div class="pattern-bar"></div>
-          <h2>SETTINGS</h2>
+          <h2 id="settings-title">SETTINGS</h2>
           <label for="volume-slider">BACKGROUND SOUND VOLUME</label>
           <input id="volume-slider" type="range" min="0" max="100" value="60">
           <button id="settings-sound-button" class="menu-button">SOUND ON</button>
