@@ -241,10 +241,13 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 
 .rules-card { text-align: left; }
 .rules-card {
-  width: min(1180px, 96vw);
-  padding-bottom: 18px;
+  width: min(1280px, 94vw);
+  padding: 0 36px 24px;
 }
-.rules-card h2 { margin-bottom: 14px; text-align: center; font-size: 42px; }
+.rules-card .pattern-bar {
+  margin: 0 -36px 24px;
+}
+.rules-card h2 { margin-bottom: 14px; text-align: center; font-size: 38px; }
 .rules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .rules-grid article { padding: 16px; border: 2px solid #b88b48; border-radius: 9px; background: #fff9e8; }
 .rules-grid b, .rules-grid span { display: block; }
@@ -253,9 +256,9 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 /* Rule book carousel. Dots are added from main.js. */
 .tutorial-shell {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  grid-template-columns: 42px minmax(0, 1fr) 42px;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tutorial-track {
@@ -364,8 +367,8 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 }
 
 .tutorial-arrow {
-  width: 48px;
-  height: 62px;
+  width: 42px;
+  height: 58px;
   border: 3px solid var(--line);
   border-radius: 9px;
   color: #fff7da;
@@ -4844,14 +4847,17 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 #rules-screen .tutorial-slide {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(300px, .9fr);
-  min-height: 455px;
+  align-items: center;
+  min-height: min(58vh, 540px);
   background: #f8e5ad;
 }
 
 #rules-screen .tutorial-shot {
   display: block;
   position: relative;
-  min-height: 455px;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
   border-right: 3px solid var(--line);
   background: #e7c476;
@@ -4869,22 +4875,22 @@ h1 { margin-bottom: 8px; font-size: clamp(38px, 7vw, 72px); letter-spacing: .08e
 #rules-screen .tutorial-copy {
   max-width: none;
   margin: 0;
-  padding: 24px 26px;
+  padding: 28px;
   overflow-y: auto;
 }
 
 #rules-screen .tutorial-slide span {
-  font-size: clamp(38px, 3.5vw, 56px);
+  font-size: 54px;
 }
 
 #rules-screen .tutorial-slide h3 {
-  margin-bottom: 10px;
-  font-size: clamp(24px, 2vw, 32px);
+  margin-bottom: 15px;
+  font-size: 30px;
 }
 
 #rules-screen .tutorial-slide p {
-  font-size: clamp(14px, 1vw, 18px);
-  line-height: 1.42;
+  font-size: 18px;
+  line-height: 1.55;
 }
 
 #rules-screen .tutorial-slide ul {

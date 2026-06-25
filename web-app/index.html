@@ -60,47 +60,31 @@
     <section id="rules-screen" class="screen">
       <div class="stone-scene">
         <div class="rules-card panel">
-          <button class="back-button" data-back="menu-screen">&larr; BACK</button>
           <div class="pattern-bar"></div>
-          <h2>HOW TO PLAY</h2>
+          <button class="back-button" data-back="menu-screen">&larr; BACK</button>
+          <h2>CAVE GAME QUICK GUIDE</h2>
           <div class="tutorial-shell">
             <button id="tutorial-prev" class="tutorial-arrow" aria-label="Previous rule">&larr;</button>
             <div id="tutorial-track" class="tutorial-track">
               <article class="tutorial-slide">
-                <div class="tutorial-shot shot-board"><img src="assets/tutorial/01-board.png" alt="The exploration board"></div>
-                <div class="tutorial-copy"><span>01</span><h3>GAME GOAL</h3><p>The adventure lasts for <strong>five rounds</strong>.</p><p>Your goal is to collect as much treasure as possible and finish the game with the highest score.</p><p>In each round, explorers may enter the cave, collect treasure, face danger, and decide whether to keep exploring or return safely to their tent.</p></div>
+                <div class="tutorial-shot shot-board"><img src="assets/tutorial/guide-01-goal.png" alt="Game goal spotlight guide"></div>
+                <div class="tutorial-copy"><span>01</span><h3>GAME GOAL</h3><p>5 rounds.</p><p>Explore the cave.</p><p>Collect treasure and relics.</p><p>Return safely to score.</p><p><strong>Highest score wins.</strong></p></div>
               </article>
               <article class="tutorial-slide">
-                <div class="tutorial-shot shot-treasure"><img src="assets/tutorial/02-treasure.png" alt="Treasure revealed during exploration"></div>
-                <div class="tutorial-copy"><span>02</span><h3>ENTER THE CAVE</h3><p>Before a local game begins, players may enter their names and choose from eight character designs.</p><p>At the beginning of the game, each player starts with <strong>four blue gems</strong> as their starting fund. These four points count in the final score from the start.</p><p>Every explorer who wants to enter a round must pay <strong>one blue gem</strong> as a deposit.</p><p>The deposit is deducted at the start of the round. It is returned only if the explorer returns safely to the tent. If the explorer does not return safely, the deposit is lost.</p><p>After this, one ancient relic card numbered <strong>1-5</strong> is secretly added to the deck for that round.</p><p>The deeper you go, the greater the reward, but also the greater the danger.</p></div>
+                <div class="tutorial-shot shot-treasure"><img src="assets/tutorial/guide-02-card-pool.png" alt="Card pool spotlight guide"></div>
+                <div class="tutorial-copy"><span>02</span><h3>CARD POOL</h3><p>35 cards total:</p><p>15 Treasure + 15 Danger + 5 Relics.</p><p>Each round: draw 20 cards onto the route.</p><p>Relic values: 1=10, 2=20, 3=30, 4=40, 5=50 pts.</p></div>
               </article>
               <article class="tutorial-slide">
-                <div class="tutorial-shot shot-choice"><img src="assets/tutorial/03-choice.png" alt="The dice and choice flow"></div>
-                <div class="tutorial-copy"><span>03</span><h3>MOVE AND REVEAL</h3><p>The full card pool contains <strong>15 treasure cards</strong>, <strong>15 danger cards</strong>, and <strong>5 relic cards</strong>.</p><p>In each round, the 20 cards on the board are randomly drawn from the treasure and danger cards, with that round's relic card added to the deck.</p><p>When your explorer's tent is highlighted, click the white dice.</p><p>Your explorer moves forward by the number shown on the dice. Then, the landing card is revealed:</p><ul><li>If the card is hidden, it flips open.</li><li>If the card is already open, it is shown again.</li></ul><p>Landing cards may reveal <strong>treasure</strong>, <strong>relics</strong>, or <strong>danger</strong>.</p></div>
+                <div class="tutorial-shot shot-choice"><img src="assets/tutorial/guide-03-move-reveal.png" alt="Move and reveal spotlight guide"></div>
+                <div class="tutorial-copy"><span>03</span><h3>MOVE &amp; REVEAL</h3><p>Start with 4 blue gems.</p><p>Pay 1 gem to enter a round.</p><p>It is returned only if the explorer returns safely to the tent.</p><p>Roll the white dice.</p><p>Move and reveal the card.</p><p>Cards can be: Treasure / Danger / Relic.</p><p>Loot is safe only after returning.</p></div>
               </article>
               <article class="tutorial-slide">
-                <div class="tutorial-shot shot-danger"><img src="assets/tutorial/04-danger.png" alt="The player pack and secret choice area"></div>
-                <div class="tutorial-copy"><span>04</span><h3>UNDERSTAND YOUR PACK</h3><p>Your pack shows what you currently have and what is already safe.</p><dl><dt>SAVED TOTAL</dt><dd>Your safe score, including the four starting gems, secured treasure, safely claimed relics, and any lost deposits.</dd><dt>ARTIFACTS</dt><dd>Special relic bonuses you have collected. These are included once they are safely claimed.</dd><dt>CURRENT ROUND</dt><dd>This round's gain. It can show <strong>-1</strong> if the explorer loses the entry deposit to danger.</dd></dl><p>In local multiplayer, the pack may stay private until it is that player's choice step.</p></div>
+                <div class="tutorial-shot shot-relic"><img src="assets/tutorial/guide-04-choose.png" alt="Choose your fate spotlight guide"></div>
+                <div class="tutorial-copy"><span>04</span><h3>CHOOSE YOUR FATE</h3><p>After each reveal: choose within 8 seconds.</p><p><strong>KEEP EXPLORING:</strong> go deeper and risk more.</p><p><strong>RETURN TO TENT:</strong> leave safely and save loot.</p><p>One returner takes all revealed treasure.</p><p>Multiple returners share equally.</p><p>Leftovers stay on the route.</p><p>Relics need exactly one returner.</p></div>
               </article>
               <article class="tutorial-slide">
-                <div class="tutorial-shot shot-relic"><img src="assets/tutorial/05-relic.png" alt="Relic and danger cards on the route"></div>
-                <div class="tutorial-copy"><span>05</span><h3>CHOOSE YOUR FATE</h3><p>After each card is revealed, you have <strong>8 seconds</strong> to choose:</p><p><strong>KEEP EXPLORING</strong><br>Continue deeper into the cave and risk collecting more treasure.</p><p><strong>RETURN TO TENT</strong><br>Leave the cave safely, recover your deposit, and secure the treasure currently on the route.</p><p>In local multiplayer mode, <strong>QUIT GAME</strong> removes that player from the rest of the match.</p></div>
-              </article>
-              <article class="tutorial-slide">
-                <div class="tutorial-shot shot-finish"><img src="assets/tutorial/06-final.png" alt="Final ranking screen"></div>
-                <div class="tutorial-copy"><span>06</span><h3>SHARE RETURNED TREASURE</h3><p>If only one person leaves, the person takes all the treasures revealed on the board.</p><p>If multiple players choose to return to the tent at the same time, they share the treasure currently on the route equally.</p><p>Any treasure that cannot be divided equally remains on the route for later players to claim.</p><p>Choose carefully. Staying longer may bring greater rewards, but it may also cost you everything from that round.</p></div>
-              </article>
-              <article class="tutorial-slide">
-                <div class="tutorial-shot shot-danger"><img src="assets/tutorial/04-danger.png" alt="Duplicate danger ends the round"></div>
-                <div class="tutorial-copy"><span>07</span><h3>WATCH FOR DANGER</h3><p>There are <strong>15 danger cards</strong> in total:</p><ul><li>3 Fire cards</li><li>3 Landslide cards</li><li>3 Snake cards</li><li>3 Spider cards</li><li>3 Mummy cards</li></ul><p>The first danger card of a type is only a warning.</p><p>If a second matching danger card appears in the same round, the round ends immediately. All explorers still inside the cave lose their Round Loot and their deposit.</p><p>After that, all three cards of that danger type are removed from the deck for later rounds.</p></div>
-              </article>
-              <article class="tutorial-slide">
-                <div class="tutorial-shot shot-finish"><img src="assets/tutorial/06-final.png" alt="Final scoring and winner"></div>
-                <div class="tutorial-copy"><span>08</span><h3>CLAIM RELICS AND WIN</h3><p>Relics are special bonus treasures.</p><p>A relic can only be claimed when <strong>exactly one explorer</strong> returns to the tent at that moment.</p><ul><li>Relic 1: 10 points</li><li>Relic 2: 20 points</li><li>Relic 3: 30 points</li><li>Relic 4: 40 points</li><li>Relic 5: 50 points</li></ul><p>Before a local game begins, players may enter their names and choose from eight characters.</p><p>After the fifth round ends, all secured treasure and safely claimed relics are counted. The explorer with the highest score wins.</p></div>
-              </article>
-              <article class="tutorial-slide">
-                <div class="tutorial-shot shot-treasure"><img src="assets/tutorial/02-treasure.png" alt="Treasure cards and gem values"></div>
-                <div class="tutorial-copy"><span>09</span><h3>TREASURE CARD VALUES</h3><p>There are <strong>15 treasure cards</strong> in the full card pool.</p><p>The treasure cards are worth:</p><ul><li><strong>1, 2, 3, 4</strong></li><li><strong>5, 5</strong></li><li><strong>7, 7</strong></li><li><strong>9</strong></li><li><strong>11, 11</strong></li><li><strong>13, 14, 15, 17</strong></li></ul><p>Cards with larger numbers are rarer and more valuable, so revealing one can make the route much more tempting.</p><p>Treasure is shown with gems: blue gems are worth <strong>1</strong>, black gems are worth <strong>5</strong>, and gold gems are worth <strong>10</strong>.</p></div>
+                <div class="tutorial-shot shot-danger"><img src="assets/tutorial/guide-05-danger-win.png" alt="Danger and winning spotlight guide"></div>
+                <div class="tutorial-copy"><span>05</span><h3>DANGER &amp; WIN</h3><p>5 danger types. 3 cards each.</p><p>First danger = warning.</p><p>Same danger again = round ends.</p><p>Players still inside lose Round Loot + Deposit.</p><p>That danger type is removed.</p><p>Maximum: 2 danger types removed.</p><p>Then all remaining dangers stay.</p><p>After 5 rounds, count saved treasure, gems, deposits, and relics.</p><p><strong>Highest score wins.</strong></p></div>
               </article>
             </div>
             <button id="tutorial-next" class="tutorial-arrow" aria-label="Next rule">&rarr;</button>

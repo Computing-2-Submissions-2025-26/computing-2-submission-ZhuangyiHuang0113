@@ -1,77 +1,147 @@
-# Inca Treasure
+# Temple Treasure
 
 **CID:** 02573495.
 
-This is a browser version of an Incan Gold / Diamant style treasure game. The
-player explores a cave over five rounds, collects gems, decides whether to keep
-going or return to camp, and tries not to get caught by a repeated danger card.
+Temple Treasure is a browser-based push-your-luck board game. Players explore a
+dangerous temple route over five rounds, reveal treasure, danger and relic cards,
+then decide whether to keep going or return safely to camp.
 
-The game logic is separated from the page code. The rules are in
-`web-app/IncaTreasure.js`, while `web-app/main.js` draws the screen, handles
-buttons and runs the small animations.
+![Temple Treasure tutorial screenshot](web-app/assets/tutorial/guide-04-choose.png)
 
-This structure makes the rules easier to test. If the design changes later, the
-scoring and card rules stay in the same place.
+## Game reference
 
-## Files to check
+The main design is inspired by the tabletop game **Incan Gold / Diamant**. I
+used its central push-your-luck idea: players can continue deeper into the cave
+for more treasure, but a repeated danger can wipe out the loot carried by anyone
+still inside.
 
-- `web-app/index.html` - the page structure.
-- `web-app/default.css` - the layout, board and visual style.
-- `web-app/main.js` - browser code and UI state.
-- `web-app/IncaTreasure.js` - reusable game module with JSDoc comments.
-- `web-app/tests/IncaTreasure.test.js` - Mocha tests for the rules.
-- `web-app/tests/TEST-SPECIFICATION.md` - short test plan.
+This version adapts that reference into a browser game with:
 
-The image assets are in `web-app/assets/`, including the tutorial
-screenshots used on the How To Play page.
+- a five-round match structure;
+- a visible 20-card route each round;
+- entry deposits paid with blue gems;
+- solo-return relic rewards;
+- local multiplayer or bot opponents;
+- a guided How To Play carousel with spotlight screenshots.
 
-## Coursework checklist
+## How to play
 
-- [x] API module included in `web-app/IncaTreasure.js`.
-- [x] `jsdoc.json` points to the API module.
-- [x] JSDoc generated in `docs/`.
-- [x] Game module implemented and usable without the page.
-- [x] Unit test specification included in `web-app/tests/`.
-- [x] Mocha unit tests implemented.
-- [x] Web app implemented in `web-app/index.html`, `default.css` and `main.js`.
-- [x] `node_modules/` ignored by `.gitignore`.
+Each explorer starts with four blue gems. At the start of a round, active
+explorers pay one gem as a deposit to enter the cave. On each turn, the active
+explorer rolls the dice, moves along the route and reveals or revisits a card.
 
-## How to run it
+Card effects:
 
-Install the packages once:
+- **Treasure:** treasure is left on the route until explorers return to camp.
+- **Danger:** the first copy is a warning; a second matching danger ends the
+  round for explorers still inside.
+- **Relic:** a relic is scored only when exactly one explorer returns to camp.
 
-```properties
+After each reveal, explorers choose to keep exploring or return to camp. Safe
+returners secure carried loot, shared route treasure and their refunded deposit.
+After five rounds, the highest secured score wins. Relic count breaks score ties.
+
+## Code structure
+
+- `web-app/TempleTreasure.js` - the DOM-free rules module and public API.
+- `web-app/main.js` - browser UI state, input handling, timers, animation and
+  audio.
+- `web-app/index.html` - menu, rules carousel, game screen, settings and final
+  ranking markup.
+- `web-app/default.css` - board layout, cards, characters, popups and responsive
+  visual styling.
+- `web-app/tests/TempleTreasure.test.js` - Mocha unit tests for the rules module.
+- `web-app/tests/TEST-SPECIFICATION.md` - written test plan with inputs and
+  expected results.
+- `docs/` - generated JSDoc API documentation.
+
+The artwork, audio and tutorial images are stored in `web-app/assets/`.
+
+## Rules module and API
+
+The core game logic is separated from the browser. `TempleTreasure.js` uses plain
+JavaScript data and pure-style functions so the rules can be tested without
+opening the page. The UI calls this module instead of duplicating score, deck or
+danger logic in the DOM layer.
+
+Public functions intended for review:
+
+- `createPlayers(options)`
+- `createRoundDeck(options)`
+- `preparePlayersForRound(players, options)`
+- `distributeTreasure(players, card)`
+- `settleReturningPlayers(players, revealed, leavingIds)`
+- `failRound(players, dangerPool, dangerName, options)`
+- `chooseBotAction(player, context)`
+- `scorePlayer(player)`
+- `rankPlayers(players)`
+
+Important implemented rules:
+
+- treasure values stay on the route until players return;
+- shared returns split all visible route treasure and leave remainders behind;
+- solo returns claim visible relics, with relic number multiplied by 10;
+- duplicate dangers fail the round for active explorers;
+- only the first two duplicated danger types are removed from later decks;
+- final scoring counts secured tent points, not unspent wallet gems.
+
+## Testing and documentation
+
+The project includes both a written test specification and executable unit tests.
+The tests focus on the reusable rules module rather than the browser animation
+layer.
+
+Current covered behaviours include:
+
+- deterministic shuffle behaviour;
+- round setup, deposits and final-round drop rules;
+- deck composition;
+- route treasure accumulation;
+- safe returns, shared treasure and relic claims;
+- duplicate danger failure and danger removal limits;
+- final ranking and tie-breaking.
+
+JSDoc comments in `TempleTreasure.js` generate the API pages in `docs/`.
+
+## How to run
+
+Install dependencies once:
+
+```bash
 npm install
 ```
 
-Then run the checks:
+Run the checks:
 
-```properties
+```bash
 npm test
 npm run docs
 npm run lint
 ```
 
-To play the game, open `web-app/index.html` in the browser. If the browser blocks
-local files, use a small local server from the project folder.
+To play, serve the project with a local web server and open:
 
-## Rules module
+```text
+http://127.0.0.1:5500/web-app/index.html
+```
 
-The public functions intended for marking are:
+For example, this can be done with the Live Server extension in VS Code.
+Double-clicking the HTML file may block module imports or audio in some
+browsers, so a local server is recommended.
 
-- `createPlayers(options)`
-- `createRoundDeck(options)`
-- `preparePlayersForRound(players)`
-- `distributeTreasure(players, card)`
-- `settleReturningPlayers(players, revealed, leavingIds)`
-- `failRound(players, dangerPool, dangerName)`
-- `chooseBotAction(player, context)`
-- `scorePlayer(player)`
-- `rankPlayers(players)`
+## Coursework checklist
 
-These functions are kept away from the DOM so they can be tested without opening
-the game page. The generated JSDoc pages are written to `docs/` after running
-`npm run docs`.
+- [x] Browser game implemented in HTML, CSS and JavaScript.
+- [x] Independent API module included in `web-app/TempleTreasure.js`.
+- [x] API module documented with JSDoc comments.
+- [x] Generated JSDoc documentation included in `docs/`.
+- [x] Written test specification included in `web-app/tests/`.
+- [x] Mocha unit tests included and passing.
+- [x] `package-lock.json` included for repeatable installs.
+- [x] `node_modules/` ignored by `.gitignore`.
 
-Relics use this version's rule: the printed relic number is multiplied by 10, so
-relic 5 is worth 50 points.
+## Submission notes
+
+- Replace the CID line at the top before final submission.
+- Do not submit `node_modules/`; it is ignored by `.gitignore`.
+- Keep `package-lock.json` so npm installs the same tool versions.

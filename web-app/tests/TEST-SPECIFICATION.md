@@ -24,14 +24,17 @@ returned state with the expected result.
 
 ## Treasure distribution
 
-- Treasure value 15 splits between four active explorers as 3 each, with 3 left
-  on the card.
+- Treasure value 15 is added to the public route pool instead of being given to
+  explorers immediately.
   - Input: four active explorers and a treasure card worth 15.
-  - Expected result: each explorer gains 3 round loot, and card leftover is 3.
-- An explorer already back at camp does not receive new cave loot.
-  - Input: one explorer is inactive before an 11-point treasure is resolved.
-  - Expected result: only the three active explorers gain loot, and the inactive
-    explorer stays at 0.
+  - Expected result: each explorer still has 0 round loot, the card leftover is
+    15, and the card is not marked collected.
+- Revisiting a treasure card can add that card's value to the route pool again.
+  - Input: a treasure card worth 7 is resolved twice.
+  - Expected result: the card leftover becomes 14.
+- Treasure already on a route card keeps accumulating.
+  - Input: a treasure card worth 11 already has 4 leftover.
+  - Expected result: the card leftover becomes 15.
 
 ## Returning to camp
 
@@ -40,6 +43,11 @@ returned state with the expected result.
     on the route.
   - Expected result: the explorer's tent gains 12 points: 8 loot, 3 leftover
     treasure and 1 returned deposit.
+- Multiple returning explorers split all route leftovers evenly, with any
+  indivisible remainder staying on the route.
+  - Input: two explorers return while treasure cards have 4 and 7 leftover.
+  - Expected result: both explorers gain 5 route treasure, and 1 point remains
+    visible on the route.
 - Exactly one returning explorer can claim a relic, using the printed number
   multiplied by 10.
   - Input: one explorer returns while relic number 3 is open.
